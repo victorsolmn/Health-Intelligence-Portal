@@ -1,0 +1,1542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HCL Health Intelligence Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        "primary": "#00236f",
+        "primary-container": "#1e3a8a",
+        "on-primary": "#ffffff",
+        "secondary": "#006c49",
+        "secondary-container": "#6cf8bb",
+        "on-secondary-container": "#00714d",
+        "tertiary": "#5c0016",
+        "tertiary-fixed": "#ffdada",
+        "on-tertiary-fixed-variant": "#920028",
+        "surface": "#f8f9fa",
+        "surface-bright": "#f8f9fa",
+        "surface-container-lowest": "#ffffff",
+        "surface-container-low": "#f3f4f5",
+        "surface-container": "#edeeef",
+        "surface-container-high": "#e7e8e9",
+        "on-surface": "#191c1d",
+        "on-surface-variant": "#444651",
+        "outline-variant": "#c5c5d3",
+      },
+      fontFamily: { sans: ["Inter", "sans-serif"] },
+      boxShadow: {
+        "ambient": "0 10px 40px -10px rgba(0, 35, 111, 0.06)",
+        "ambient-md": "0 16px 48px -8px rgba(0, 35, 111, 0.10)",
+      }
+    }
+  }
+}
+</script>
+<style>
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+  font-size: 18px;
+  line-height: 1;
+}
+.nav-icon { font-size: 20px; }
+.page-section { display: none; }
+.page-section.active { display: block; }
+.nav-item { transition: all 0.15s ease; cursor: pointer; border-left: 3px solid transparent; }
+.nav-item:hover { background: #f3f4f5; }
+.nav-item.active { background: #f3f4f5; border-left-color: #00236f; color: #00236f; font-weight: 600; }
+.nav-item.active .material-symbols-outlined { color: #00236f; }
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-thumb { background: #c5c5d3; border-radius: 2px; }
+.chat-msg { animation: fadeUp 0.25s ease; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+.dot { animation: typingBounce 1.4s infinite; }
+.dot:nth-child(2) { animation-delay: 0.2s; }
+.dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typingBounce { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-4px); } }
+.toggle { position: relative; display: inline-block; width: 44px; height: 24px; }
+.toggle input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; inset: 0; background: #c5c5d3; border-radius: 24px; transition: .2s; }
+.slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: .2s; }
+input:checked + .slider { background: #006c49; }
+input:checked + .slider:before { transform: translateX(20px); }
+.card { background: white; border-radius: 0.75rem; box-shadow: 0 10px 40px -10px rgba(0,35,111,0.06); }
+.card-ring { background: white; border-radius: 0.75rem; box-shadow: 0 10px 40px -10px rgba(0,35,111,0.06); ring: 1px solid rgba(197,197,211,0.2); }
+</style>
+</head>
+<body class="bg-surface font-sans text-on-surface" style="font-family:'Inter',sans-serif;">
+
+<div class="flex h-screen overflow-hidden">
+
+<!-- ═══════════════════ SIDEBAR ═══════════════════ -->
+<div class="w-60 flex-shrink-0 flex flex-col bg-white overflow-y-auto border-r border-outline-variant/20" style="min-width:240px;">
+  <!-- Logo -->
+  <div class="px-4 pt-5 pb-4">
+    <div class="flex items-center gap-3 mb-1">
+      <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center font-bold text-white text-sm flex-shrink-0">H</div>
+      <div>
+        <div class="text-sm font-bold text-primary leading-tight">HEALTH</div>
+        <div class="text-[10px] uppercase tracking-widest text-on-surface-variant">INTELLIGENCE PORTAL</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Client Switcher -->
+  <div class="px-4 pb-4">
+    <div class="text-[10px] uppercase tracking-widest text-on-surface-variant mb-1.5">Client</div>
+    <select id="clientSwitcher" onchange="switchClient(this.value)" class="w-full bg-surface-container-low text-on-surface text-xs rounded-lg px-3 py-2 border-none focus:outline-none focus:ring-2 focus:ring-primary/20 appearance-none" style="background-image:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23444651' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E\");background-repeat:no-repeat;background-position:right 10px center;">
+      <option value="techcorp">TechCorp India GCC</option>
+      <option value="mfgcorp">MFG Corp (AHC Only)</option>
+      <option value="financeinc">Finance Inc (OHC+Claims)</option>
+    </select>
+  </div>
+
+  <!-- Nav -->
+  <nav class="flex-1 px-2 space-y-0.5 pb-3">
+    <div class="text-[10px] uppercase tracking-widest text-on-surface-variant px-3 mb-2">Main</div>
+    <div class="nav-item active flex items-center gap-3 px-3 py-2.5 rounded-r-lg text-sm text-on-surface-variant" onclick="showPage('overview',this)">
+      <span class="material-symbols-outlined nav-icon text-on-surface-variant">dashboard</span><span>Overview</span>
+    </div>
+    <div class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-r-lg text-sm text-on-surface-variant" onclick="showPage('workforce',this)">
+      <span class="material-symbols-outlined nav-icon text-on-surface-variant">groups</span><span>Workforce Health</span>
+    </div>
+    <div class="nav-item nav-ahc nav-ohc flex items-center gap-3 px-3 py-2.5 rounded-r-lg text-sm text-on-surface-variant" onclick="showPage('utilization',this)">
+      <span class="material-symbols-outlined nav-icon text-on-surface-variant">bar_chart</span><span>Programme Utilization</span>
+    </div>
+    <div class="nav-item nav-claims flex items-center gap-3 px-3 py-2.5 rounded-r-lg text-sm text-on-surface-variant" onclick="showPage('cost',this)">
+      <span class="material-symbols-outlined nav-icon text-on-surface-variant">payments</span><span>Cost &amp; ROI</span>
+    </div>
+    <div class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-r-lg text-sm text-on-surface-variant" onclick="showPage('risk',this)">
+      <span class="material-symbols-outlined nav-icon text-on-surface-variant">security</span><span>Risk Intelligence</span>
+    </div>
+    <div class="text-[10px] uppercase tracking-widest text-on-surface-variant px-3 mb-2 mt-4">Tools</div>
+    <div class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-r-lg text-sm text-on-surface-variant" onclick="showPage('assistant',this)">
+      <span class="material-symbols-outlined nav-icon text-on-surface-variant">smart_toy</span>
+      <span>AI Assistant</span>
+      <span class="ml-auto bg-secondary-container text-on-secondary-container text-[10px] px-1.5 py-0.5 rounded-full font-medium">Beta</span>
+    </div>
+    <div class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-r-lg text-sm text-on-surface-variant" onclick="showPage('dataproducts',this)">
+      <span class="material-symbols-outlined nav-icon text-on-surface-variant">biotech</span><span>Data Products</span>
+    </div>
+    <div class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-r-lg text-sm text-on-surface-variant" onclick="showPage('settings',this)">
+      <span class="material-symbols-outlined nav-icon text-on-surface-variant">settings</span><span>Settings</span>
+    </div>
+  </nav>
+
+  <!-- User -->
+  <div class="px-4 py-4 border-t border-outline-variant/20">
+    <div class="flex items-center gap-2.5">
+      <div class="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white text-xs font-semibold flex-shrink-0">PS</div>
+      <div>
+        <div class="text-sm font-medium text-on-surface">Priya Sharma</div>
+        <div class="text-[10px] uppercase tracking-widest text-on-surface-variant">Benefits Head</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ MAIN AREA ═══════════════════ -->
+<div class="flex-1 flex flex-col overflow-hidden">
+
+  <!-- Header -->
+  <div class="bg-white border-b border-outline-variant/20 px-6 py-3 flex items-center justify-between flex-shrink-0 sticky top-0 z-10">
+    <div class="text-sm text-on-surface-variant">
+      Dashboard / <span id="pageTitle" class="text-on-surface font-semibold">Overview</span>
+    </div>
+    <div class="flex items-center gap-3">
+      <select class="text-xs bg-surface-container-low text-on-surface rounded-lg px-3 py-1.5 border-none focus:outline-none appearance-none pr-7" style="background-image:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23444651' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E\");background-repeat:no-repeat;background-position:right 8px center;">
+        <option>YTD 2026</option><option>FY 2025–26</option><option>Q3 FY26</option>
+      </select>
+      <button class="bg-primary text-white rounded-lg px-4 py-2 text-sm font-medium flex items-center gap-1.5 hover:bg-primary-container transition-colors">
+        <span class="material-symbols-outlined" style="font-size:14px;">upload</span> Export Report
+      </button>
+    </div>
+  </div>
+
+  <!-- Scrollable Content -->
+  <div class="flex-1 overflow-y-auto bg-surface">
+
+<!-- ═══════════════════════════════════════════
+     PAGE 1: OVERVIEW
+═══════════════════════════════════════════ -->
+<div id="page-overview" class="page-section active p-6">
+
+  <!-- Page Title -->
+  <div class="mb-6">
+    <h1 class="text-3xl font-bold tracking-tight text-on-surface">Welcome back, Priya.</h1>
+    <p class="text-sm text-on-surface-variant mt-1">Here is the snapshot of your workforce health and utilization.</p>
+  </div>
+
+  <!-- 4 KPI Tiles -->
+  <div class="grid grid-cols-4 gap-4 mb-6">
+    <!-- KPI 1: Covered Lives -->
+    <div class="card p-5">
+      <div class="text-[10px] uppercase tracking-widest text-on-surface-variant mb-3">Covered Lives</div>
+      <div class="text-4xl font-bold tracking-tight text-on-surface">5,200</div>
+      <div class="mt-3">
+        <span class="bg-secondary-container text-on-secondary-container rounded-full text-xs px-2 py-0.5 font-medium">+120 this month</span>
+      </div>
+    </div>
+    <!-- KPI 2: Workforce Health Score -->
+    <div class="card p-5">
+      <div class="text-[10px] uppercase tracking-widest text-on-surface-variant mb-3">Workforce Health Score</div>
+      <div class="text-4xl font-bold tracking-tight text-on-surface">78<span class="text-xl text-on-surface-variant font-normal">/100</span></div>
+      <div class="mt-3">
+        <span class="bg-secondary-container text-on-secondary-container rounded-full text-xs px-2 py-0.5 font-medium">+2.7% vs last quarter</span>
+      </div>
+    </div>
+    <!-- KPI 3: AHC Completion -->
+    <div class="card p-5">
+      <div class="text-[10px] uppercase tracking-widest text-on-surface-variant mb-3">AHC Completion</div>
+      <div class="text-4xl font-bold tracking-tight text-on-surface">64%</div>
+      <div class="mt-3 mb-2">
+        <div class="bg-surface-container-high rounded-full h-1.5"><div class="bg-secondary rounded-full h-1.5" style="width:64%"></div></div>
+      </div>
+      <div class="text-xs text-on-surface-variant">Target 75% · <span class="text-on-surface font-medium">3.2k completed</span></div>
+    </div>
+    <!-- KPI 4: High-Risk Employees -->
+    <div class="card p-5">
+      <div class="text-[10px] uppercase tracking-widest text-on-surface-variant mb-3">High-Risk Employees</div>
+      <div class="text-4xl font-bold tracking-tight text-on-surface">412</div>
+      <div class="mt-3">
+        <span class="bg-tertiary-fixed text-on-tertiary-fixed-variant rounded-full text-xs px-2 py-0.5 font-medium">-10 from last month</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Executive Summary -->
+  <div class="bg-primary rounded-xl p-5 mb-6 text-white">
+    <div class="flex items-center gap-2 mb-3">
+      <span class="material-symbols-outlined" style="font-size:18px;color:rgba(255,255,255,0.8);">auto_awesome</span>
+      <span class="text-[10px] uppercase tracking-widest" style="color:rgba(255,255,255,0.7);">AI Executive Summary</span>
+    </div>
+    <p class="text-sm leading-relaxed" style="color:rgba(255,255,255,0.9);">OHC utilization has increased <strong class="text-white">15%</strong> quarter-over-quarter, reflecting strong employee adoption of on-site health services. A notable cardiovascular risk concern has emerged in the <strong class="text-white">35–45 age group</strong>, with lipid and BP anomalies up 22%. The 412 undiagnosed high-risk employees represent ₹38.4L in projected avoided-cost opportunity if engaged with targeted outreach before Q2.</p>
+  </div>
+
+  <!-- Charts Row -->
+  <div class="grid grid-cols-2 gap-4 mb-6">
+    <!-- Health Risk Stratification -->
+    <div class="card p-5">
+      <div class="mb-4">
+        <h2 class="text-lg font-semibold text-on-surface">Health Risk Stratification</h2>
+        <p class="text-xs text-on-surface-variant mt-0.5">Population distribution by risk tier</p>
+      </div>
+      <div class="flex items-center gap-6">
+        <div class="relative flex-shrink-0" style="width:160px;height:160px;">
+          <canvas id="overviewRiskChart"></canvas>
+          <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+            <div class="text-xl font-bold text-on-surface">5,200</div>
+            <div class="text-[10px] uppercase tracking-widest text-on-surface-variant">TOTAL</div>
+          </div>
+        </div>
+        <div class="flex-1 space-y-2.5 text-sm">
+          <div class="flex justify-between items-center">
+            <span class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background:#5c0016;"></span><span class="text-on-surface-variant">Very High</span></span>
+            <span class="font-semibold text-on-surface">312 (6%)</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background:#c2410c;"></span><span class="text-on-surface-variant">High</span></span>
+            <span class="font-semibold text-on-surface">884 (17%)</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background:#d97706;"></span><span class="text-on-surface-variant">Medium</span></span>
+            <span class="font-semibold text-on-surface">1,820 (35%)</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background:#006c49;"></span><span class="text-on-surface-variant">Low</span></span>
+            <span class="font-semibold text-on-surface">2,184 (42%)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Programme Utilization Trends -->
+    <div class="card p-5">
+      <div class="mb-4">
+        <h2 class="text-lg font-semibold text-on-surface">Programme Utilization Trends</h2>
+        <p class="text-xs text-on-surface-variant mt-0.5">AHC vs OHC completion over quarters</p>
+      </div>
+      <canvas id="overviewTrendChart" height="155"></canvas>
+    </div>
+  </div>
+
+  <!-- Actionable Recommendations -->
+  <div class="bg-surface-container-low rounded-xl p-5">
+    <div class="text-[10px] uppercase tracking-widest text-on-surface-variant mb-4">Actionable Recommendations</div>
+    <div class="space-y-3">
+      <div class="flex items-center justify-between gap-4 bg-white rounded-xl p-4 shadow-ambient">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 bg-tertiary-fixed rounded-lg flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-on-tertiary-fixed-variant" style="font-size:18px;">monitor_heart</span>
+          </div>
+          <div>
+            <div class="text-sm font-semibold text-on-surface">Run a Diabetes Screening camp at Bangalore office</div>
+            <div class="text-xs text-on-surface-variant mt-0.5">412 employees match pre-diabetic pattern · ₹38.4L projected exposure</div>
+          </div>
+        </div>
+        <button class="bg-on-surface text-white rounded-lg px-4 py-2 text-xs font-medium whitespace-nowrap hover:opacity-80 transition-opacity" style="background:#191c1d;">Schedule Campaign</button>
+      </div>
+      <div class="flex items-center justify-between gap-4 bg-white rounded-xl p-4 shadow-ambient">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 bg-secondary-container rounded-lg flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-on-secondary-container" style="font-size:18px;">notifications</span>
+          </div>
+          <div>
+            <div class="text-sm font-semibold text-on-surface">Send AHC reminder to 1,200 pending employees</div>
+            <div class="text-xs text-on-surface-variant mt-0.5">Completion at 64% — target 75% by end of quarter</div>
+          </div>
+        </div>
+        <button class="bg-on-surface text-white rounded-lg px-4 py-2 text-xs font-medium whitespace-nowrap hover:opacity-80 transition-opacity" style="background:#191c1d;">Send Comm.</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     PAGE 2: WORKFORCE HEALTH
+═══════════════════════════════════════════ -->
+<div id="page-workforce" class="page-section p-6">
+  <div class="mb-6">
+    <h1 class="text-3xl font-bold tracking-tight text-on-surface">Workforce Health Profile</h1>
+    <p class="text-sm text-on-surface-variant mt-1">Clinical insights derived from AHC biometrics and OHC visit data.</p>
+  </div>
+
+  <!-- 4 KPI Tiles -->
+  <div class="grid grid-cols-4 gap-4 mb-6">
+    <div class="card p-5">
+      <div class="text-[10px] uppercase tracking-widest text-on-surface-variant mb-3">Avg. Health Score</div>
+      <div class="text-4xl font-bold tracking-tight text-on-surface">78<span class="text-xl text-on-surface-variant font-normal">/100</span></div>
+      <div class="mt-3 text-xs text-on-surface-variant">Stable vs last quarter</div>
+    </div>
+    <div class="card p-5">
+      <div class="text-[10px] uppercase tracking-widest text-on-surface-variant mb-3">New Clinical Abnormalities</div>
+      <div class="text-4xl font-bold tracking-tight text-on-surface">18%</div>
+      <div class="mt-3">
+        <span class="bg-tertiary-fixed text-on-tertiary-fixed-variant rounded-full text-xs px-2 py-0.5 font-medium">From 50+ lab parameters</span>
+      </div>
+    </div>
+    <div class="card p-5">
+      <div class="text-[10px] uppercase tracking-widest text-on-surface-variant mb-3">Top OHC Diagnosis</div>
+      <div class="text-2xl font-bold tracking-tight text-on-surface mt-1">Ergonomic Strain</div>
+      <div class="mt-3 text-xs text-on-surface-variant">22% of all clinic visits</div>
+    </div>
+    <div class="card p-5">
+      <div class="text-[10px] uppercase tracking-widest text-on-surface-variant mb-3">High-Risk Shift</div>
+      <div class="text-4xl font-bold tracking-tight text-on-surface">+2.4%</div>
+      <div class="mt-3">
+        <span class="bg-tertiary-fixed text-on-tertiary-fixed-variant rounded-full text-xs px-2 py-0.5 font-medium">Medium to High risk</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Row -->
+  <div class="grid grid-cols-2 gap-4 mb-6">
+    <!-- Chronic Conditions -->
+    <div class="card p-5">
+      <div class="mb-4">
+        <h2 class="text-lg font-semibold text-on-surface">Prevalence of Chronic Conditions</h2>
+        <p class="text-xs text-on-surface-variant mt-0.5">% of workforce affected</p>
+      </div>
+      <div class="space-y-4">
+        <div>
+          <div class="flex justify-between text-xs mb-1.5"><span class="text-on-surface-variant">Dyslipidemia</span><span class="font-semibold text-on-surface">38%</span></div>
+          <div class="bg-surface-container-high rounded-full h-2"><div class="bg-primary rounded-full h-2 transition-all" style="width:38%"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between text-xs mb-1.5"><span class="text-on-surface-variant">Hypertension</span><span class="font-semibold text-on-surface">25%</span></div>
+          <div class="bg-surface-container-high rounded-full h-2"><div class="bg-primary rounded-full h-2 transition-all" style="width:25%"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between text-xs mb-1.5"><span class="text-on-surface-variant">Obesity (BMI ≥30)</span><span class="font-semibold text-on-surface">18%</span></div>
+          <div class="bg-surface-container-high rounded-full h-2"><div class="rounded-full h-2 transition-all" style="width:18%;background:#d97706;"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between text-xs mb-1.5"><span class="text-on-surface-variant">Diabetes (HbA1c ≥6.5%)</span><span class="font-semibold text-on-surface">12%</span></div>
+          <div class="bg-surface-container-high rounded-full h-2"><div class="rounded-full h-2 transition-all" style="width:12%;background:#5c0016;"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between text-xs mb-1.5"><span class="text-on-surface-variant">Mental Health Risk</span><span class="font-semibold text-on-surface">8%</span></div>
+          <div class="bg-surface-container-high rounded-full h-2"><div class="bg-secondary rounded-full h-2 transition-all" style="width:8%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Health Risk by Age Demographics -->
+    <div class="card p-5">
+      <div class="mb-4">
+        <h2 class="text-lg font-semibold text-on-surface">Health Risk by Age Demographics</h2>
+        <p class="text-xs text-on-surface-variant mt-0.5">Risk distribution across age bands</p>
+      </div>
+      <canvas id="bmiChart" height="200"></canvas>
+    </div>
+  </div>
+
+  <!-- Emerging Concerns Table -->
+  <div class="card p-5">
+    <div class="mb-4">
+      <h2 class="text-lg font-semibold text-on-surface">Top Emerging Health Concerns &amp; Interventions</h2>
+    </div>
+    <div class="bg-surface-container-low rounded-xl overflow-hidden">
+      <div class="grid grid-cols-3 gap-4 px-5 py-3">
+        <div class="text-[10px] uppercase tracking-widest text-on-surface-variant">Emerging Concern</div>
+        <div class="text-[10px] uppercase tracking-widest text-on-surface-variant">Projected Impact</div>
+        <div class="text-[10px] uppercase tracking-widest text-on-surface-variant">Recommended Intervention</div>
+      </div>
+      <div class="divide-y divide-outline-variant/20">
+        <div class="grid grid-cols-3 gap-4 px-5 py-4 bg-white">
+          <div>
+            <div class="text-sm font-semibold text-on-surface">MSK / Physio Spike</div>
+            <div class="text-xs text-on-surface-variant mt-0.5">Ergonomic strain up 28% this quarter</div>
+          </div>
+          <div class="flex items-center">
+            <span class="bg-tertiary-fixed text-on-tertiary-fixed-variant rounded-full text-xs px-2 py-0.5 font-medium">LOST PRODUCTIVITY</span>
+          </div>
+          <div class="flex items-center">
+            <button class="bg-on-surface text-white rounded-lg px-3 py-1.5 text-xs font-medium hover:opacity-80" style="background:#191c1d;">Schedule Office Ergonomics Audit</button>
+          </div>
+        </div>
+        <div class="grid grid-cols-3 gap-4 px-5 py-4 bg-white">
+          <div>
+            <div class="text-sm font-semibold text-on-surface">15% Increase — Mental Wellness</div>
+            <div class="text-xs text-on-surface-variant mt-0.5">PHQ-9 self-assessments indicating high stress</div>
+          </div>
+          <div class="flex items-center">
+            <span class="rounded-full text-xs px-2 py-0.5 font-medium" style="background:#fef3c7;color:#92400e;">HIGH STRESS INDICATORS</span>
+          </div>
+          <div class="flex items-center">
+            <button class="bg-on-surface text-white rounded-lg px-3 py-1.5 text-xs font-medium hover:opacity-80" style="background:#191c1d;">Deploy Stress Management Workshop</button>
+          </div>
+        </div>
+        <div class="grid grid-cols-3 gap-4 px-5 py-4 bg-white">
+          <div>
+            <div class="text-sm font-semibold text-on-surface">Low Dental Hygiene</div>
+            <div class="text-xs text-on-surface-variant mt-0.5">Reported by 31% of OHC dental assessments</div>
+          </div>
+          <div class="flex items-center">
+            <span class="bg-surface-container-high text-on-surface-variant rounded-full text-xs px-2 py-0.5 font-medium">PREVENTABLE FUTURE CLAIMS</span>
+          </div>
+          <div class="flex items-center">
+            <button class="bg-on-surface text-white rounded-lg px-3 py-1.5 text-xs font-medium hover:opacity-80" style="background:#191c1d;">Organise On-site Dental Camp</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     PAGE 3: PROGRAMME UTILIZATION
+═══════════════════════════════════════════ -->
+<div id="page-utilization" class="page-section p-6">
+  <div class="mb-6">
+    <h1 class="text-3xl font-bold tracking-tight text-on-surface">Programme Utilization &amp; Engagement</h1>
+    <p class="text-sm text-on-surface-variant mt-1">Track adoption and effectiveness of health programmes across the workforce.</p>
+  </div>
+
+  <!-- 4 KPI Tiles -->
+  <div class="grid grid-cols-4 gap-4 mb-6">
+    <div id="sec-ahc" class="card p-5">
+      <div class="text-[10px] uppercase tracking-widest text-on-surface-variant mb-3">AHC Completion Rate</div>
+      <div class="text-4xl font-bold tracking-tight text-on-surface">64%</div>
+      <div class="text-xs text-on-surface-variant mt-2">Target 75% · 3.2k completed</div>
+      <div class="mt-2">
+        <span class="bg-tertiary-fixed text-on-tertiary-fixed-variant rounded-full text-xs px-2 py-0.5 font-medium">NEEDS ATTENTION</span>
+      </div>
+    </div>
+    <div id="sec-ohc" class="card p-5">
+      <div class="text-[10px] uppercase tracking-widest text-on-surface-variant mb-3">OHC Monthly Footfall</div>
+      <div class="text-4xl font-bold tracking-tight text-on-surface">850</div>
+      <div class="mt-3">
+        <span class="bg-secondary-container text-on-secondary-container rounded-full text-xs px-2 py-0.5 font-medium">+12% vs last month</span>
+      </div>
+    </div>
+    <div id="sec-app" class="card p-5">
+      <div class="text-[10px] uppercase tracking-widest text-on-surface-variant mb-3">App Active Users (MAU)</div>
+      <div class="text-4xl font-bold tracking-tight text-on-surface">45%</div>
+      <div class="mt-3 text-xs text-on-surface-variant">Consistent daily activity</div>
+    </div>
+    <div class="card p-5">
+      <div class="text-[10px] uppercase tracking-widest text-on-surface-variant mb-3">Clinic No-Show Rate</div>
+      <div class="text-4xl font-bold tracking-tight text-on-surface">8%</div>
+      <div class="mt-3">
+        <span class="bg-secondary-container text-on-secondary-container rounded-full text-xs px-2 py-0.5 font-medium">Improvement from Q3</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Row -->
+  <div class="grid grid-cols-2 gap-4 mb-6">
+    <!-- OHC Service Breakdown -->
+    <div class="card p-5">
+      <div class="mb-4">
+        <h2 class="text-lg font-semibold text-on-surface">OHC Service Breakdown</h2>
+        <p class="text-xs text-on-surface-variant mt-0.5">Distribution of clinic visits by service type</p>
+      </div>
+      <div class="flex items-center gap-5">
+        <div class="relative flex-shrink-0" style="width:150px;height:150px;">
+          <canvas id="referralChart"></canvas>
+          <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+            <div class="text-lg font-bold text-on-surface">2,480</div>
+            <div class="text-[10px] uppercase tracking-widest text-on-surface-variant">TOTAL</div>
+          </div>
+        </div>
+        <div class="flex-1 space-y-2.5 text-xs">
+          <div class="flex justify-between"><span class="text-on-surface-variant flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm inline-block" style="background:#00236f;"></span>GP Consults</span><span class="font-semibold text-on-surface">45%</span></div>
+          <div class="flex justify-between"><span class="text-on-surface-variant flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm inline-block" style="background:#006c49;"></span>Physiotherapy</span><span class="font-semibold text-on-surface">25%</span></div>
+          <div class="flex justify-between"><span class="text-on-surface-variant flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm inline-block" style="background:#d97706;"></span>Mental Wellness</span><span class="font-semibold text-on-surface">20%</span></div>
+          <div class="flex justify-between"><span class="text-on-surface-variant flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm inline-block" style="background:#c5c5d3;"></span>Dental</span><span class="font-semibold text-on-surface">10%</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AHC Completion by Location -->
+    <div class="card p-5">
+      <div class="mb-4">
+        <h2 class="text-lg font-semibold text-on-surface">AHC Completion by Location</h2>
+        <p class="text-xs text-on-surface-variant mt-0.5">vs 75% benchmark target</p>
+      </div>
+      <div class="space-y-4">
+        <div>
+          <div class="flex justify-between text-xs mb-1.5"><span class="text-on-surface-variant">Bangalore</span><span class="font-semibold text-on-surface">72%</span></div>
+          <div class="bg-surface-container-high rounded-full h-2 relative"><div class="bg-secondary rounded-full h-2" style="width:72%"></div><div class="absolute top-0 h-2 w-0.5 bg-outline-variant" style="left:75%;"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between text-xs mb-1.5"><span class="text-on-surface-variant">Hyderabad</span><span class="font-semibold text-on-surface">58%</span></div>
+          <div class="bg-surface-container-high rounded-full h-2 relative"><div class="rounded-full h-2" style="width:58%;background:#d97706;"></div><div class="absolute top-0 h-2 w-0.5 bg-outline-variant" style="left:75%;"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between text-xs mb-1.5"><span class="text-on-surface-variant">Pune</span><span class="font-semibold text-on-surface">61%</span></div>
+          <div class="bg-surface-container-high rounded-full h-2 relative"><div class="rounded-full h-2" style="width:61%;background:#d97706;"></div><div class="absolute top-0 h-2 w-0.5 bg-outline-variant" style="left:75%;"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between text-xs mb-1.5"><span class="text-on-surface-variant">Delhi NCR</span><span class="font-semibold text-on-surface">45%</span></div>
+          <div class="bg-surface-container-high rounded-full h-2 relative"><div class="rounded-full h-2" style="width:45%;background:#5c0016;"></div><div class="absolute top-0 h-2 w-0.5 bg-outline-variant" style="left:75%;"></div></div>
+        </div>
+        <div class="bg-tertiary-fixed/50 rounded-lg px-3 py-2 flex items-center gap-2">
+          <span class="material-symbols-outlined text-on-tertiary-fixed-variant" style="font-size:14px;">warning</span>
+          <span class="text-xs text-on-tertiary-fixed-variant font-medium">Critical underutilization detected in Delhi NCR</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Engagement Alerts -->
+  <div class="bg-surface-container-low rounded-xl p-5">
+    <div class="text-[10px] uppercase tracking-widest text-on-surface-variant mb-4">Engagement Alerts &amp; Recommended Actions</div>
+    <div class="bg-white rounded-xl overflow-hidden shadow-ambient">
+      <div class="grid grid-cols-3 gap-4 px-5 py-3 bg-surface-container-low">
+        <div class="text-[10px] uppercase tracking-widest text-on-surface-variant">Priority</div>
+        <div class="text-[10px] uppercase tracking-widest text-on-surface-variant">Alert Intelligence</div>
+        <div class="text-[10px] uppercase tracking-widest text-on-surface-variant">Action</div>
+      </div>
+      <div class="divide-y divide-outline-variant/20">
+        <div class="grid grid-cols-3 gap-4 px-5 py-4 items-center">
+          <div><span class="bg-tertiary-fixed text-on-tertiary-fixed-variant rounded-full text-xs px-2 py-0.5 font-medium">CRITICAL</span></div>
+          <div class="text-sm text-on-surface">Delhi NCR office is 30% below AHC completion target</div>
+          <div><button class="bg-on-surface text-white rounded-lg px-3 py-1.5 text-xs font-medium hover:opacity-80" style="background:#191c1d;">Trigger Email Campaign</button></div>
+        </div>
+        <div class="grid grid-cols-3 gap-4 px-5 py-4 items-center">
+          <div><span class="bg-secondary-container text-on-secondary-container rounded-full text-xs px-2 py-0.5 font-medium">EFFICIENCY</span></div>
+          <div class="text-sm text-on-surface">Physiotherapy slots at Bangalore OHC running at 98% capacity</div>
+          <div><button class="bg-on-surface text-white rounded-lg px-3 py-1.5 text-xs font-medium hover:opacity-80" style="background:#191c1d;">Request Additional Physio Staff</button></div>
+        </div>
+        <div class="grid grid-cols-3 gap-4 px-5 py-4 items-center">
+          <div><span class="bg-surface-container text-on-surface-variant rounded-full text-xs px-2 py-0.5 font-medium">RETENTION</span></div>
+          <div class="text-sm text-on-surface">High drop-off rate (40%) in mental wellness follow-up sessions</div>
+          <div><button class="bg-on-surface text-white rounded-lg px-3 py-1.5 text-xs font-medium hover:opacity-80" style="background:#191c1d;">Review Counsellor Availability</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     PAGE 4: COST & ROI
+═══════════════════════════════════════════ -->
+<div id="page-cost" class="page-section p-6">
+  <div class="mb-6">
+    <h1 class="text-3xl font-bold tracking-tight text-on-surface">Financial Performance &amp; ROI</h1>
+    <p class="text-sm text-on-surface-variant mt-1">Track claims expenditure, programme investments, and rigorously validated cost savings.</p>
+  </div>
+
+  <!-- 4 KPI Tiles with left border accent -->
+  <div class="grid grid-cols-4 gap-4 mb-6">
+    <div class="card p-5 border-l-4" style="border-left-color:#5c0016;">
+      <div class="text-[10px] uppercase tracking-widest text-on-surface-variant mb-3">Total Claims Spend</div>
+      <div class="text-4xl font-bold tracking-tight text-on-surface">₹14.8 Cr</div>
+      <div class="mt-3">
+        <span class="bg-tertiary-fixed text-on-tertiary-fixed-variant rounded-full text-xs px-2 py-0.5 font-medium">+12% vs ₹13.2Cr last year</span>
+      </div>
+    </div>
+    <div class="card p-5 border-l-4" style="border-left-color:#006c49;">
+      <div class="text-[10px] uppercase tracking-widest text-on-surface-variant mb-3">Claims Loss Ratio</div>
+      <div class="text-4xl font-bold tracking-tight text-on-surface">68%</div>
+      <div class="mt-3">
+        <span class="bg-secondary-container text-on-secondary-container rounded-full text-xs px-2 py-0.5 font-medium">Favourable: Below 70% threshold</span>
+      </div>
+    </div>
+    <div class="card p-5 border-l-4" style="border-left-color:#00236f;">
+      <div class="text-[10px] uppercase tracking-widest text-on-surface-variant mb-3">Programme Investment</div>
+      <div class="text-4xl font-bold tracking-tight text-on-surface">₹2.7 Cr</div>
+      <div class="mt-3 text-xs text-on-surface-variant">AHC ₹1.1Cr + OHC ₹1.6Cr</div>
+    </div>
+    <div class="card p-5 border-l-4" style="border-left-color:#006c49;">
+      <div class="text-[10px] uppercase tracking-widest text-on-surface-variant mb-3 flex items-center gap-1">
+        Causal ROI (DiD)
+        <span class="material-symbols-outlined text-on-surface-variant" style="font-size:14px;" title="Difference-in-Differences methodology">info</span>
+      </div>
+      <div class="text-4xl font-bold tracking-tight text-on-surface">1.4x</div>
+      <div class="mt-3 text-xs text-on-surface-variant">₹1.2Cr avoided (95% CI)</div>
+    </div>
+  </div>
+
+  <!-- Charts Row -->
+  <div class="grid grid-cols-2 gap-4 mb-6">
+    <div class="card p-5">
+      <div class="mb-4">
+        <h2 class="text-lg font-semibold text-on-surface">Claims PEPM Trend</h2>
+        <p class="text-xs text-on-surface-variant mt-0.5">Actual vs projected · 8 quarters</p>
+      </div>
+      <canvas id="pepmChart" height="170"></canvas>
+    </div>
+    <div class="card p-5">
+      <div class="mb-4">
+        <h2 class="text-lg font-semibold text-on-surface">Claims by Category</h2>
+        <p class="text-xs text-on-surface-variant mt-0.5">Total Claims ₹84.5L breakdown</p>
+      </div>
+      <div class="flex items-center gap-5">
+        <div class="relative flex-shrink-0" style="width:150px;height:150px;">
+          <canvas id="claimsPieChart"></canvas>
+          <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
+            <div class="text-xs font-bold text-on-surface leading-tight">TOTAL</div>
+            <div class="text-xs font-bold text-on-surface leading-tight">₹84.5L</div>
+          </div>
+        </div>
+        <div class="flex-1 space-y-2 text-xs">
+          <div class="flex justify-between"><span class="flex items-center gap-1.5 text-on-surface-variant"><span class="w-2.5 h-2.5 rounded-sm" style="display:inline-block;background:#5c0016;"></span>Cardiac</span><span class="font-semibold text-on-surface">₹28.4L</span></div>
+          <div class="flex justify-between"><span class="flex items-center gap-1.5 text-on-surface-variant"><span class="w-2.5 h-2.5 rounded-sm" style="display:inline-block;background:#d97706;"></span>Maternity</span><span class="font-semibold text-on-surface">₹22.5L</span></div>
+          <div class="flex justify-between"><span class="flex items-center gap-1.5 text-on-surface-variant"><span class="w-2.5 h-2.5 rounded-sm" style="display:inline-block;background:#c2410c;"></span>Diabetes</span><span class="font-semibold text-on-surface">₹18.7L</span></div>
+          <div class="flex justify-between"><span class="flex items-center gap-1.5 text-on-surface-variant"><span class="w-2.5 h-2.5 rounded-sm" style="display:inline-block;background:#c5c5d3;"></span>Others</span><span class="font-semibold text-on-surface">₹15.3L</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Insight Cards -->
+  <div class="grid grid-cols-2 gap-4">
+    <!-- Dependent Risk Insight -->
+    <div class="rounded-xl p-5" style="background:#fffbeb;border:1px solid #fde68a;">
+      <div class="text-[10px] uppercase tracking-widest mb-3" style="color:#92400e;">HIGH PRIORITY INSIGHT</div>
+      <h3 class="text-base font-bold mb-2" style="color:#78350f;">Hidden Driver: Dependent Risk</h3>
+      <p class="text-sm mb-4" style="color:#92400e;">₹28.4L cardiac spend. 3 of 5 high-cost claimants (HCC) are parents aged 62–74 on family floaters. This India-specific pattern is not visible in claims-only analysis.</p>
+      <div class="grid grid-cols-2 gap-3 mb-4 text-xs">
+        <div class="bg-white rounded-lg p-3" style="border:1px solid #fde68a;"><div class="font-bold text-lg" style="color:#92400e;">₹28.4L</div><div style="color:#78350f;">Top category: Cardiac</div></div>
+        <div class="bg-white rounded-lg p-3" style="border:1px solid #fde68a;"><div class="font-bold text-lg" style="color:#92400e;">3 of 5</div><div style="color:#78350f;">HCC are parent dependents</div></div>
+      </div>
+      <button class="text-xs font-medium px-4 py-2 rounded-lg border" style="border-color:#d97706;color:#92400e;background:transparent;">Review Dependent Strategy →</button>
+    </div>
+
+    <!-- Scientific Validation -->
+    <div class="rounded-xl p-5" style="background:#f0fdf4;border:1px solid #86efac;">
+      <div class="text-[10px] uppercase tracking-widest mb-3" style="color:#166534;">SCIENTIFIC VALIDATION</div>
+      <h3 class="text-base font-bold mb-2" style="color:#14532d;">Rigorous ROI Validation</h3>
+      <div class="grid grid-cols-2 gap-3 mb-3 text-xs">
+        <div class="bg-white rounded-lg p-3" style="border:1px solid #86efac;">
+          <div class="font-medium mb-1" style="color:#6b7280;">Naïve Estimate</div>
+          <div class="text-xl font-bold line-through" style="color:#9ca3af;">₹3.1 Cr</div>
+          <div style="color:#ef4444;font-size:10px;">Inflated by selection bias</div>
+        </div>
+        <div class="bg-white rounded-lg p-3" style="border:2px solid #4ade80;">
+          <div class="font-semibold mb-1" style="color:#166534;">DiD Estimate</div>
+          <div class="text-xl font-bold" style="color:#15803d;">₹1.2 Cr saved</div>
+          <div style="color:#166534;font-size:10px;">95% CI: ₹0.8Cr – ₹1.6Cr</div>
+        </div>
+      </div>
+      <p class="text-xs mb-4" style="color:#166534;font-style:italic;">"Using Difference-in-Differences methodology with matched control cohorts — same standard as Jones, Molitor &amp; Reif 2019, NBER w24229."</p>
+      <button class="bg-secondary text-white text-xs font-medium px-4 py-2 rounded-lg hover:opacity-90 transition-opacity">View Methodology →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     PAGE 5: RISK INTELLIGENCE
+═══════════════════════════════════════════ -->
+<div id="page-risk" class="page-section p-6">
+  <div class="mb-6">
+    <h1 class="text-3xl font-bold tracking-tight text-on-surface">Proactive Risk Intelligence</h1>
+    <p class="text-sm text-on-surface-variant mt-1">AI-powered identification of risk tiers, care gaps, and predicted high-cost claimants.</p>
+  </div>
+
+  <!-- Risk Tier Cards -->
+  <div class="grid grid-cols-4 gap-4 mb-6">
+    <div class="card p-5 border-l-4" style="border-left-color:#5c0016;">
+      <div class="text-[10px] uppercase tracking-widest text-on-surface-variant mb-2">Very High Risk</div>
+      <div class="text-4xl font-bold tracking-tight text-on-surface">312</div>
+      <div class="text-sm text-on-surface-variant mt-1">6% of workforce</div>
+      <div class="text-xs text-on-surface-variant mt-2">2+ chronic conditions + recent hospitalisation</div>
+    </div>
+    <div class="card p-5 border-l-4" style="border-left-color:#c2410c;">
+      <div class="text-[10px] uppercase tracking-widest text-on-surface-variant mb-2">High Risk</div>
+      <div class="text-4xl font-bold tracking-tight text-on-surface">884</div>
+      <div class="text-sm text-on-surface-variant mt-1">17% of workforce</div>
+      <div class="text-xs text-on-surface-variant mt-2">1 chronic condition or multiple risk factors</div>
+    </div>
+    <div class="card p-5 border-l-4" style="border-left-color:#d97706;">
+      <div class="text-[10px] uppercase tracking-widest text-on-surface-variant mb-2">Medium Risk</div>
+      <div class="text-4xl font-bold tracking-tight text-on-surface">1,820</div>
+      <div class="text-sm text-on-surface-variant mt-1">35% of workforce</div>
+      <div class="text-xs text-on-surface-variant mt-2">Borderline labs or lifestyle factors</div>
+    </div>
+    <div class="card p-5 border-l-4" style="border-left-color:#006c49;">
+      <div class="text-[10px] uppercase tracking-widest text-on-surface-variant mb-2">Low Risk</div>
+      <div class="text-4xl font-bold tracking-tight text-on-surface">2,184</div>
+      <div class="text-sm text-on-surface-variant mt-1">42% of workforce</div>
+      <div class="text-xs text-on-surface-variant mt-2">All labs normal, no chronic conditions</div>
+    </div>
+  </div>
+
+  <!-- Critical Alert -->
+  <div class="rounded-xl p-5 mb-6 flex items-start gap-4" style="background:rgba(255,218,218,0.5);">
+    <div class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style="background:#ffdada;">
+      <span class="material-symbols-outlined" style="color:#920028;font-size:20px;">warning</span>
+    </div>
+    <div class="flex-1">
+      <div class="text-sm font-bold text-on-surface mb-1">Critical Alert: Undiagnosed Chronic Conditions</div>
+      <p class="text-sm text-on-surface-variant">412 employees have AHC lab values indicating Diabetes (HbA1c ≥6.5%) but have ZERO corresponding medical or claims diagnoses. Projected cost if untreated: <strong class="text-on-surface">₹38.4L</strong>. Early intervention has 73% reversal rate.</p>
+    </div>
+    <button class="bg-tertiary text-white rounded-lg px-4 py-2 text-sm font-medium whitespace-nowrap flex-shrink-0 hover:opacity-90 transition-opacity">Launch Targeted Outreach</button>
+  </div>
+
+  <!-- Two Column -->
+  <div class="grid grid-cols-2 gap-4 mb-6">
+    <!-- Predicted HCC -->
+    <div class="card p-5">
+      <div class="flex items-center gap-2 mb-4">
+        <h2 class="text-lg font-semibold text-on-surface">Predicted High-Cost Claimants</h2>
+        <span class="bg-primary-container text-white text-[10px] px-2 py-0.5 rounded-full font-medium tracking-widest">LIGHTGBM MODEL</span>
+      </div>
+      <p class="text-xs text-on-surface-variant mb-4">Next 12 months · AUC 0.89 on validation set · identifies top 1.5% most likely to exceed ₹5L</p>
+      <div class="space-y-3 mb-4">
+        <div class="flex items-center justify-between bg-surface-container-low rounded-xl px-4 py-3">
+          <div>
+            <div class="text-sm font-semibold text-on-surface">Top 5% Risk Pool</div>
+            <div class="text-xs text-on-surface-variant">Rising HbA1c trend across 2+ AHCs</div>
+          </div>
+          <div class="text-right">
+            <div class="text-lg font-bold text-on-surface">78</div>
+            <div class="text-xs text-on-surface-variant">employees</div>
+          </div>
+        </div>
+        <div class="flex items-center justify-between bg-surface-container-low rounded-xl px-4 py-3">
+          <div>
+            <div class="text-sm font-semibold text-on-surface">Post-Acute Management</div>
+            <div class="text-xs text-on-surface-variant">Prior hospitalisation in last 18 months</div>
+          </div>
+          <div class="text-right">
+            <div class="text-lg font-bold text-on-surface">142</div>
+            <div class="text-xs text-on-surface-variant">employees</div>
+          </div>
+        </div>
+        <div class="flex items-center justify-between bg-surface-container-low rounded-xl px-4 py-3">
+          <div>
+            <div class="text-sm font-semibold text-on-surface">Multi-Chronic Unstable</div>
+            <div class="text-xs text-on-surface-variant">Cardio-Metabolic comorbidities</div>
+          </div>
+          <div class="text-right">
+            <div class="text-lg font-bold text-on-surface">96</div>
+            <div class="text-xs text-on-surface-variant">employees</div>
+          </div>
+        </div>
+      </div>
+      <a href="#" class="text-xs text-primary font-semibold hover:underline">View Detailed Predicted List →</a>
+    </div>
+
+    <!-- Risk by Department -->
+    <div class="card p-5">
+      <div class="mb-4">
+        <h2 class="text-lg font-semibold text-on-surface">Risk Tier by Department</h2>
+        <p class="text-xs text-on-surface-variant mt-0.5">High + Very High risk employees</p>
+      </div>
+      <canvas id="deptChart" height="230"></canvas>
+    </div>
+  </div>
+
+  <!-- Care Gaps -->
+  <div class="bg-surface-container-low rounded-xl p-5">
+    <div class="text-[10px] uppercase tracking-widest text-on-surface-variant mb-4">Care Gaps — Treatment Adherence</div>
+    <div class="grid grid-cols-3 gap-4">
+      <div class="bg-white rounded-xl p-4 shadow-ambient">
+        <div class="flex justify-between items-start mb-2">
+          <div class="text-sm font-semibold text-on-surface">Hypertension Gap</div>
+          <div class="text-2xl font-bold text-on-surface">184</div>
+        </div>
+        <p class="text-xs text-on-surface-variant mb-3">High BP in AHC, no pharmacy claims for antihypertensive medication.</p>
+        <button class="bg-primary text-white text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-primary-container transition-colors">Nudge via App ▶</button>
+      </div>
+      <div class="bg-white rounded-xl p-4 shadow-ambient">
+        <div class="flex justify-between items-start mb-2">
+          <div class="text-sm font-semibold text-on-surface">Diabetes Gap</div>
+          <div class="text-2xl font-bold text-on-surface">127</div>
+        </div>
+        <p class="text-xs text-on-surface-variant mb-3">HbA1c ≥7 in AHC, no metformin or insulin in pharmacy claims.</p>
+        <button class="bg-primary text-white text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-primary-container transition-colors">Nudge via App ▶</button>
+      </div>
+      <div class="bg-white rounded-xl p-4 shadow-ambient">
+        <div class="flex justify-between items-start mb-2">
+          <div class="text-sm font-semibold text-on-surface">Dyslipidemia Gap</div>
+          <div class="text-2xl font-bold text-on-surface">243</div>
+        </div>
+        <p class="text-xs text-on-surface-variant mb-3">High LDL/TC in AHC, no statin in pharmacy claims.</p>
+        <button class="bg-primary text-white text-xs font-medium px-3 py-1.5 rounded-lg hover:bg-primary-container transition-colors">Nudge via App ▶</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     PAGE 6: AI ASSISTANT
+═══════════════════════════════════════════ -->
+<div id="page-assistant" class="page-section">
+  <div class="flex h-full" style="min-height:calc(100vh - 57px);">
+    <!-- Left: Chat Area -->
+    <div class="flex-1 flex flex-col bg-white p-6 min-h-0" style="min-width:0;">
+      <h1 class="text-4xl font-bold tracking-tight text-on-surface mb-2">Ask anything about your workforce health.</h1>
+      <p class="text-sm font-medium mb-5" style="color:#006c49;">No employee medical data ever leaves your secure perimeter.</p>
+
+      <!-- Suggestion chips -->
+      <div class="flex flex-wrap gap-2 mb-5">
+        <button onclick="askQ('Why did our premium go up?')" class="text-xs border border-outline-variant text-on-surface-variant rounded-full px-3 py-1.5 hover:bg-surface-container-low transition-colors">Why did our premium go up?</button>
+        <button onclick="askQ('Which department has the highest risk?')" class="text-xs border border-outline-variant text-on-surface-variant rounded-full px-3 py-1.5 hover:bg-surface-container-low transition-colors">Which department has the highest risk?</button>
+        <button onclick="askQ('What did we get for our wellness spend?')" class="text-xs border border-outline-variant text-on-surface-variant rounded-full px-3 py-1.5 hover:bg-surface-container-low transition-colors">What did we get for our wellness spend?</button>
+      </div>
+
+      <!-- Chat messages -->
+      <div id="chatMessages" class="flex-1 overflow-y-auto space-y-4 mb-4" style="min-height:300px;max-height:calc(100vh - 380px);">
+        <div class="chat-msg flex gap-3">
+          <div class="w-7 h-7 bg-primary rounded-full flex items-center justify-center text-white text-xs flex-shrink-0 mt-0.5">AI</div>
+          <div class="bg-surface-container-low rounded-2xl rounded-tl-none p-4 max-w-lg">
+            <p class="text-sm text-on-surface-variant">Hello Priya! Ask me anything about your workforce health data. I translate your question to a secure query, run it against your data, and return an answer — without ever accessing individual employee records.</p>
+            <div class="mt-2 bg-secondary-container/40 text-on-secondary-container text-xs px-2 py-1 rounded-lg inline-flex items-center gap-1">
+              <span class="material-symbols-outlined" style="font-size:12px;">lock</span>
+              Zero PHI sent to LLM. Schema + aggregated results only.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Status + Input -->
+      <div class="text-xs text-on-surface-variant mb-2 flex items-center gap-1.5">
+        <span class="w-1.5 h-1.5 bg-secondary rounded-full inline-block"></span>
+        QUERYING SEMANTIC LAYER...
+      </div>
+      <div class="flex gap-3">
+        <input id="chatInput" type="text" placeholder="Ask a question about your workforce health data..." class="flex-1 bg-surface-container-low rounded-2xl px-4 py-3 text-sm text-on-surface border-none focus:outline-none focus:ring-2 focus:ring-primary/20" onkeydown="if(event.key==='Enter')sendMsg()">
+        <button onclick="sendMsg()" class="bg-primary text-white rounded-2xl px-5 py-3 text-sm font-medium hover:bg-primary-container transition-colors flex items-center gap-1.5">
+          <span class="material-symbols-outlined" style="font-size:16px;">send</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Right Panel -->
+    <div class="w-80 flex-shrink-0 bg-surface-container-low p-5 overflow-y-auto border-l border-outline-variant/20">
+      <div class="text-[10px] uppercase tracking-widest text-on-surface-variant mb-4">Intelligence Backbone</div>
+
+      <!-- How it Works -->
+      <div class="card p-4 mb-4">
+        <div class="text-sm font-semibold text-on-surface mb-3">How it Works</div>
+        <div class="space-y-3">
+          <div class="flex items-start gap-3">
+            <div class="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">1</div>
+            <div><div class="text-xs font-semibold text-on-surface">You ask in plain English</div><div class="text-xs text-on-surface-variant">No SQL or data knowledge needed</div></div>
+          </div>
+          <div class="flex items-start gap-3">
+            <div class="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">2</div>
+            <div><div class="text-xs font-semibold text-on-tertiary-fixed-variant">LLM sees: schema + question only</div><div class="text-xs text-on-surface-variant">Zero employee-level data sent externally</div></div>
+          </div>
+          <div class="flex items-start gap-3">
+            <div class="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">3</div>
+            <div><div class="text-xs font-semibold text-on-surface">Query runs on your data warehouse</div><div class="text-xs text-on-surface-variant">Data never leaves your perimeter</div></div>
+          </div>
+          <div class="flex items-start gap-3">
+            <div class="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">4</div>
+            <div><div class="text-xs font-semibold text-on-surface">Aggregated result → LLM formats answer</div><div class="text-xs text-on-surface-variant">Only counts/averages returned</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Deployment Mode -->
+      <div class="card p-4 mb-4">
+        <div class="text-sm font-semibold text-on-surface mb-3">Deployment Mode</div>
+        <div class="space-y-2 text-xs">
+          <label class="flex items-start gap-2 cursor-pointer">
+            <input type="radio" name="aiMode" value="cloud" checked class="mt-0.5 accent-secondary">
+            <div><div class="font-medium text-on-surface">Text-to-SQL (Cloud LLM)</div><div class="text-on-surface-variant">PHI never sent. Recommended.</div></div>
+          </label>
+          <label class="flex items-start gap-2 cursor-pointer">
+            <input type="radio" name="aiMode" value="selfhosted" class="mt-0.5 accent-secondary">
+            <div><div class="font-medium text-on-surface">Self-hosted Llama 3.1 70B (VPC)</div><div class="text-on-surface-variant">Strictest compliance mode.</div></div>
+          </label>
+          <label class="flex items-start gap-2 cursor-pointer">
+            <input type="radio" name="aiMode" value="disabled" class="mt-0.5 accent-secondary">
+            <div><div class="font-medium text-on-surface">Disabled</div><div class="text-on-surface-variant">Standard reporting only.</div></div>
+          </label>
+        </div>
+        <div class="text-xs text-on-surface-variant mt-3">Configure in <span class="text-primary font-medium cursor-pointer" onclick="showPage('settings',document.querySelector('[onclick*=settings]'))">Settings →</span></div>
+      </div>
+
+      <!-- SQL Preview -->
+      <div class="bg-zinc-900 rounded-xl p-4">
+        <div class="text-[10px] uppercase tracking-widest mb-2" style="color:#6b7280;">Last Generated Query</div>
+        <div id="sqlPreview" class="text-xs font-mono leading-5" style="color:#4ade80;">
+          SELECT risk_tier,<br>&nbsp; COUNT(*) as employees<br>FROM dim_employee<br>WHERE employer_id = 'techcorp_gcc'<br>GROUP BY risk_tier
+        </div>
+      </div>
+
+      <!-- Documentation -->
+      <div class="mt-4 text-xs text-primary font-medium cursor-pointer hover:underline">View Documentation →</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     PAGE 7: DATA PRODUCTS
+═══════════════════════════════════════════ -->
+<div id="page-dataproducts" class="page-section p-6">
+  <div class="mb-6">
+    <h1 class="text-3xl font-bold tracking-tight text-on-surface">Advanced ML Data Products</h1>
+    <p class="text-sm text-on-surface-variant mt-1">Three high-value ML products enabled exclusively by combining AHC + OHC + Claims datasets.</p>
+  </div>
+
+  <!-- Product Cards -->
+  <div class="space-y-4 mb-6">
+    <!-- Card 1: HICC -->
+    <div class="rounded-xl overflow-hidden shadow-ambient-md">
+      <div class="grid grid-cols-3 min-h-48" style="background:linear-gradient(135deg,#1e3a8a,#00236f);">
+        <div class="col-span-2 p-6 text-white">
+          <div class="text-[10px] uppercase tracking-widest mb-2" style="color:rgba(255,255,255,0.6);">Product 01</div>
+          <h3 class="text-xl font-bold mb-2">High-Cost Claimant (HiCC) Prediction Engine</h3>
+          <p class="text-sm mb-4" style="color:rgba(255,255,255,0.8);">Binary classifier predicting which employees will become high-cost claimants (>₹5L) in the next 12 months. AUC 0.89 on validation. Enables targeted care management at highest-ROI cohort.</p>
+          <div class="flex gap-2 mb-4">
+            <span class="bg-white/20 text-white text-[10px] uppercase tracking-widest px-2 py-1 rounded-full font-medium">XGBOOST/LIGHTGBM</span>
+            <span class="bg-white/20 text-white text-[10px] uppercase tracking-widest px-2 py-1 rounded-full font-medium">SHAP EXPLANATIONS</span>
+          </div>
+          <p class="text-xs italic" style="color:rgba(255,255,255,0.7);">"HbA1c trajectory across 2 consecutive AHCs + zero diabetes claims = undiagnosed diabetic who will hospitalise in 18 months — a signal that only exists with both datasets."</p>
+        </div>
+        <div class="relative overflow-hidden" style="background:linear-gradient(135deg,#0a1628,#00236f);">
+          <div class="absolute inset-0 flex items-center justify-center">
+            <div class="text-center text-white/30">
+              <div class="text-6xl font-black tracking-tight">AUC</div>
+              <div class="text-4xl font-bold">0.89</div>
+              <div class="text-sm mt-2 opacity-60">Validation Score</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2: Undiagnosed -->
+    <div class="rounded-xl overflow-hidden shadow-ambient-md">
+      <div class="grid grid-cols-3 min-h-48" style="background:linear-gradient(135deg,#1c1917,#292524);">
+        <div class="col-span-2 p-6 text-white">
+          <div class="text-[10px] uppercase tracking-widest mb-2" style="color:rgba(255,255,255,0.6);">Product 02</div>
+          <h3 class="text-xl font-bold mb-2">Undiagnosed Chronic Disease Surfacing</h3>
+          <p class="text-sm mb-4" style="color:rgba(255,255,255,0.8);">Identifies employees whose AHC lab values strongly indicate a condition but who have zero corresponding ICD-10 code in claims. 1 in 4 employees under 35 have undiagnosed metabolic conditions.</p>
+          <div class="flex gap-2 mb-4">
+            <span class="bg-white/20 text-white text-[10px] uppercase tracking-widest px-2 py-1 rounded-full font-medium">PU LEARNING</span>
+            <span class="bg-white/20 text-white text-[10px] uppercase tracking-widest px-2 py-1 rounded-full font-medium">ANOMALY DETECTION</span>
+          </div>
+          <p class="text-xs italic" style="color:rgba(255,255,255,0.7);">"412 employees match pre-diabetic pattern — at ₹93K avg annual cost per diagnosed diabetic, that is ₹38.4L in projected exposure if unaddressed."</p>
+        </div>
+        <div class="relative overflow-hidden" style="background:linear-gradient(135deg,#0c0a09,#1c1917);">
+          <div class="absolute inset-0 flex items-center justify-center">
+            <div class="text-center text-white/30">
+              <div class="text-6xl font-black tracking-tight">412</div>
+              <div class="text-sm mt-2 opacity-60">Undiagnosed<br>Employees</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3: Causal ROI -->
+    <div class="rounded-xl overflow-hidden shadow-ambient-md">
+      <div class="grid grid-cols-3 min-h-48" style="background:linear-gradient(135deg,#052e16,#14532d);">
+        <div class="col-span-2 p-6 text-white">
+          <div class="text-[10px] uppercase tracking-widest mb-2" style="color:rgba(255,255,255,0.6);">Product 03</div>
+          <h3 class="text-xl font-bold mb-2">Causal Programme ROI Engine (Uplift Modelling)</h3>
+          <p class="text-sm mb-4" style="color:rgba(255,255,255,0.8);">Uses Difference-in-Differences and Causal Forests to rigorously estimate programme ROI — not naïve before/after. Identifies which sub-groups actually benefit from specific interventions.</p>
+          <div class="flex gap-2 mb-4">
+            <span class="bg-white/20 text-white text-[10px] uppercase tracking-widest px-2 py-1 rounded-full font-medium">CAUSAL INFERENCE</span>
+            <span class="bg-white/20 text-white text-[10px] uppercase tracking-widest px-2 py-1 rounded-full font-medium">ECONML</span>
+          </div>
+          <p class="text-xs italic" style="color:rgba(255,255,255,0.7);">"The nutrition programme worked for 31–45 pre-diabetics (CATE: –₹18,400/person/year) but not for 46+ employees already on medication."</p>
+        </div>
+        <div class="relative overflow-hidden" style="background:linear-gradient(135deg,#021a0b,#052e16);">
+          <div class="absolute inset-0 flex items-center justify-center">
+            <div class="text-center text-white/30">
+              <div class="text-5xl font-black tracking-tight">1.4x</div>
+              <div class="text-sm mt-2 opacity-60">Validated ROI</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pipeline Status -->
+  <div class="card p-5">
+    <div class="grid grid-cols-2 gap-6">
+      <div>
+        <div class="text-[10px] uppercase tracking-widest text-on-surface-variant mb-3">Quarterly Innovation Cycle</div>
+        <div class="flex gap-4 mb-4">
+          <div>
+            <div class="text-2xl font-bold tracking-tight text-on-surface">94.2%</div>
+            <div class="text-xs text-on-surface-variant">Precision Score</div>
+          </div>
+          <div class="w-px bg-outline-variant/40"></div>
+          <div>
+            <div class="text-2xl font-bold tracking-tight text-on-surface">₹12.4 Cr</div>
+            <div class="text-xs text-on-surface-variant">Quarterly Savings</div>
+          </div>
+        </div>
+        <div class="bg-surface-container-low rounded-xl p-3">
+          <div class="text-xs font-semibold text-on-surface mb-2">Production Pipeline</div>
+          <div class="space-y-2 text-xs text-on-surface-variant">
+            <div class="flex items-center gap-2"><span class="w-2 h-2 bg-secondary rounded-full"></span>HiCC Model v2.1 — Live · Retrained monthly</div>
+            <div class="flex items-center gap-2"><span class="w-2 h-2 bg-secondary rounded-full"></span>Undiagnosed Detection — Live · PU Learning</div>
+            <div class="flex items-center gap-2"><span class="w-2 h-2 bg-secondary rounded-full"></span>Causal ROI Engine — Live · Quarterly refresh</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="text-[10px] uppercase tracking-widest text-on-surface-variant mb-3">Upcoming Assets</div>
+        <div class="space-y-2.5 text-sm">
+          <div class="flex items-center gap-3 p-3 bg-surface-container-low rounded-xl">
+            <span class="material-symbols-outlined text-on-surface-variant" style="font-size:18px;">psychology</span>
+            <div><div class="font-medium text-on-surface">Mental Health Triage Model</div><div class="text-xs text-on-surface-variant">NLP on EAP sessions · Q2 2026</div></div>
+          </div>
+          <div class="flex items-center gap-3 p-3 bg-surface-container-low rounded-xl">
+            <span class="material-symbols-outlined text-on-surface-variant" style="font-size:18px;">schedule</span>
+            <div><div class="font-medium text-on-surface">Wait-time Optimizer</div><div class="text-xs text-on-surface-variant">OHC scheduling efficiency · Q3 2026</div></div>
+          </div>
+          <div class="flex items-center gap-3 p-3 bg-surface-container-low rounded-xl">
+            <span class="material-symbols-outlined text-on-surface-variant" style="font-size:18px;">hub</span>
+            <div><div class="font-medium text-on-surface">Fiscal Network Analysis</div><div class="text-xs text-on-surface-variant">Provider fraud detection · Q3 2026</div></div>
+          </div>
+        </div>
+        <a href="#" class="text-xs text-primary font-semibold hover:underline mt-3 inline-block">VIEW ROADMAP →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     PAGE 8: SETTINGS
+═══════════════════════════════════════════ -->
+<div id="page-settings" class="page-section p-6 pb-24">
+  <div class="mb-6">
+    <h1 class="text-3xl font-bold tracking-tight text-on-surface">Portal Configuration</h1>
+    <p class="text-sm text-on-surface-variant mt-1">Manage client entitlements, module access, and compliance settings.</p>
+  </div>
+
+  <div class="grid grid-cols-2 gap-5">
+    <!-- JSON Config Editor -->
+    <div>
+      <div class="flex items-center justify-between mb-2">
+        <div class="text-[10px] uppercase tracking-widest text-on-surface-variant">System Config File</div>
+        <span class="flex items-center gap-1 text-xs text-secondary font-medium"><span class="w-1.5 h-1.5 bg-secondary rounded-full animate-pulse"></span>SYNC LIVE</span>
+      </div>
+      <div class="bg-zinc-900 rounded-xl p-5" style="min-height:480px;">
+        <pre id="configDisplay" class="text-xs font-mono leading-5 overflow-x-auto overflow-y-auto" style="color:#4ade80;max-height:460px;white-space:pre-wrap;"></pre>
+      </div>
+    </div>
+
+    <!-- Right: Module Entitlements + DPDP -->
+    <div class="space-y-4">
+      <!-- Module Entitlements -->
+      <div class="card p-5">
+        <div class="text-sm font-semibold text-on-surface mb-4">Module Entitlements</div>
+        <div id="moduleToggles" class="space-y-3"></div>
+      </div>
+
+      <!-- DPDP Compliance -->
+      <div class="card p-5">
+        <div class="flex items-center justify-between mb-3">
+          <div class="text-sm font-semibold text-on-surface">DPDP Compliance Status</div>
+          <span class="bg-secondary-container text-on-secondary-container rounded-full text-xs px-2 py-0.5 font-medium">85% COMPLIANT</span>
+        </div>
+        <div class="space-y-2 text-xs">
+          <div class="flex items-center gap-2 text-on-surface-variant"><span class="material-symbols-outlined text-secondary" style="font-size:14px;">check_circle</span>Consent Manager registered with Data Protection Board</div>
+          <div class="flex items-center gap-2 text-on-surface-variant"><span class="material-symbols-outlined text-secondary" style="font-size:14px;">check_circle</span>DPIA completed (Nov 2025)</div>
+          <div class="flex items-center gap-2 text-on-surface-variant"><span class="material-symbols-outlined text-secondary" style="font-size:14px;">check_circle</span>DPO appointed (India-based)</div>
+          <div class="flex items-center gap-2 text-on-surface-variant"><span class="material-symbols-outlined text-secondary" style="font-size:14px;">check_circle</span>Data residency: India (ap-south-1)</div>
+          <div class="flex items-center gap-2 text-on-surface-variant"><span class="material-symbols-outlined" style="font-size:14px;color:#d97706;">warning</span>Phase 3 DPDP rules (May 2027) — review pending</div>
+          <div class="flex items-center gap-2 text-on-surface-variant"><span class="material-symbols-outlined" style="font-size:14px;color:#c5c5d3;">info</span>Employment-purpose processing = legitimate use</div>
+        </div>
+      </div>
+
+      <!-- AI Mode -->
+      <div class="card p-5">
+        <div class="text-sm font-semibold text-on-surface mb-3">AI Assistant Mode</div>
+        <div class="space-y-2 text-xs">
+          <label class="flex items-start gap-2 p-3 rounded-lg bg-surface-container-low cursor-pointer">
+            <input type="radio" name="aiModeSettings" value="cloud" checked class="mt-0.5 accent-secondary">
+            <div><div class="font-medium text-on-surface">Text-to-SQL (Cloud LLM)</div><div class="text-on-surface-variant">PHI never sent. Schema + aggregated results only.</div></div>
+          </label>
+          <label class="flex items-start gap-2 p-3 rounded-lg bg-surface-container-low cursor-pointer">
+            <input type="radio" name="aiModeSettings" value="selfhosted" class="mt-0.5 accent-secondary">
+            <div><div class="font-medium text-on-surface">Self-hosted Llama 3.1 70B (Client VPC)</div><div class="text-on-surface-variant">Strictest compliance. Higher ops burden.</div></div>
+          </label>
+          <label class="flex items-start gap-2 p-3 rounded-lg bg-surface-container-low cursor-pointer">
+            <input type="radio" name="aiModeSettings" value="disabled" class="mt-0.5 accent-secondary">
+            <div><div class="font-medium text-on-surface">Disabled</div><div class="text-on-surface-variant">Standard reporting only. No AI features.</div></div>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  </div><!-- end scrollable content -->
+</div><!-- end main area -->
+</div><!-- end layout -->
+
+<!-- Settings Bottom Bar -->
+<div id="settingsBar" class="fixed bottom-0 left-60 right-0 bg-surface-container-low border-t border-outline-variant/20 px-6 py-3 flex items-center justify-between z-20" style="display:none;">
+  <div class="flex items-center gap-2 text-xs text-on-surface-variant">
+    <span class="w-2 h-2 rounded-full" style="background:#d97706;"></span>
+    UNSAVED CHANGES IN CONFIG.PROD.JSON
+  </div>
+  <div class="flex items-center gap-3">
+    <button class="text-xs text-on-surface-variant font-medium px-4 py-2 rounded-lg hover:bg-surface-container transition-colors">DISCARD ALL</button>
+    <button class="bg-primary text-white rounded-lg px-4 py-2 text-xs font-medium flex items-center gap-1.5 hover:bg-primary-container transition-colors">
+      <span class="material-symbols-outlined" style="font-size:14px;">upload</span> APPLY CONFIGURATION
+    </button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// CLIENT CONFIGS
+// ═══════════════════════════════════════════
+const CLIENT_CONFIGS = {
+  techcorp: {
+    name:"TechCorp India GCC", employees:5200, period:"FY 2025–26",
+    modules:{ahc:true,ohc:true,app:true,claims:true,mental:true,dental:true,physio:true},
+    ai:{enabled:true,mode:"text-to-sql-cloud"}
+  },
+  mfgcorp: {
+    name:"MFG Corp", employees:2800, period:"FY 2025–26",
+    modules:{ahc:true,ohc:false,app:false,claims:false,mental:false,dental:false,physio:false},
+    ai:{enabled:false,mode:"disabled"}
+  },
+  financeinc: {
+    name:"Finance Inc", employees:1500, period:"FY 2025–26",
+    modules:{ahc:false,ohc:true,app:false,claims:true,mental:true,dental:false,physio:false},
+    ai:{enabled:true,mode:"text-to-sql-cloud"}
+  }
+};
+// Keep CONFIGS as alias for backward compat
+const CONFIGS = CLIENT_CONFIGS;
+let currentClient = CLIENT_CONFIGS.techcorp;
+
+function switchClient(id) {
+  currentClient = CLIENT_CONFIGS[id];
+  applyModuleVisibility();
+  renderToggles();
+  renderConfig(id);
+}
+
+function applyModuleVisibility() {
+  const m = currentClient.modules;
+  const show = (id, vis) => {
+    const el = document.getElementById(id);
+    if(el) el.style.display = vis ? '' : 'none';
+  };
+  // These are handled via the utilization page KPI cards
+  // Nav items
+  document.querySelectorAll('.nav-claims').forEach(n => n.style.display = m.claims ? 'flex' : 'none');
+  document.querySelectorAll('.nav-ahc').forEach(n => { if(!m.ahc && !m.ohc) n.style.display = 'none'; else n.style.display = 'flex'; });
+}
+
+function renderToggles() {
+  const defs = [
+    {key:'ahc', label:'AHC', sublabel:'ACTIVE HEALTH CURATOR', desc:'Lab results, 50+ biometric parameters'},
+    {key:'ohc', label:'OHC', sublabel:'OPTIMAL HEALTH CURATOR', desc:'Doctor visits, ICD-10 coded consults'},
+    {key:'claims', label:'Claims Feed', sublabel:'FINANCIAL DATA INGEST', desc:'PEPM, diagnosis codes, hospitalisations'},
+    {key:'app', label:'Digital Wellness App', sublabel:'PATIENT FACING MOBILE', desc:'Activity tracking, challenges, DAU/MAU'},
+    {key:'mental', label:'Mental Wellness / EAP', sublabel:'COUNSELLING PLATFORM', desc:'Sessions, PHQ-9, mental health tiers'},
+    {key:'dental', label:'Dental Services', sublabel:'DENTAL INGEST', desc:'Dental visit utilization'},
+    {key:'physio', label:'Physiotherapy', sublabel:'MSK PLATFORM', desc:'Sessions, outcomes tracking'},
+  ];
+  const m = currentClient.modules;
+  document.getElementById('moduleToggles').innerHTML = defs.map(d => `
+    <div class="flex items-center justify-between py-2">
+      <div class="flex-1 min-w-0 mr-4">
+        <div class="flex items-center gap-2">
+          <span class="text-sm font-medium text-on-surface">${d.label}</span>
+          <span class="text-[10px] uppercase tracking-widest text-on-surface-variant">/ ${d.sublabel}</span>
+        </div>
+        <div class="text-xs text-on-surface-variant mt-0.5">${d.desc}</div>
+      </div>
+      <label class="toggle flex-shrink-0">
+        <input type="checkbox" ${m[d.key] ? 'checked' : ''} onchange="updateModule('${d.key}', this.checked)">
+        <span class="slider"></span>
+      </label>
+    </div>
+  `).join('<div class="border-t border-outline-variant/20"></div>');
+}
+
+function updateModule(key, val) {
+  currentClient.modules[key] = val;
+  applyModuleVisibility();
+  const settingsBar = document.getElementById('settingsBar');
+  if(settingsBar) settingsBar.style.display = 'flex';
+}
+
+function renderConfig(id) {
+  const c = CLIENT_CONFIGS[id];
+  const json = JSON.stringify({
+    client_id: id + "_001",
+    client_name: c.name,
+    total_employees: c.employees,
+    modules: c.modules,
+    ai_assistant: c.ai,
+    risk_model: {enabled: c.modules.ahc || c.modules.claims, model: "hicc_v2.1", threshold_inr: 500000},
+    reporting_period: c.period,
+    consent_flow_version: "v2.1",
+    dpdp_consent_manager: "registered"
+  }, null, 2);
+  document.getElementById('configDisplay').textContent = json;
+}
+
+// ═══════════════════════════════════════════
+// PAGE NAVIGATION
+// ═══════════════════════════════════════════
+const pageTitles = {
+  overview: 'Overview',
+  workforce: 'Workforce Health',
+  utilization: 'Programme Utilization',
+  cost: 'Cost & ROI',
+  risk: 'Risk Intelligence',
+  assistant: 'AI Assistant',
+  dataproducts: 'Data Products',
+  settings: 'Settings'
+};
+
+function showPage(id, el) {
+  // Hide all pages
+  document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
+  const pg = document.getElementById('page-' + id);
+  if(pg) pg.classList.add('active');
+
+  // Update nav
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if(el) el.classList.add('active');
+
+  // Update breadcrumb
+  document.getElementById('pageTitle').textContent = pageTitles[id] || id;
+
+  // Settings bar
+  const settingsBar = document.getElementById('settingsBar');
+  if(settingsBar) settingsBar.style.display = (id === 'settings') ? 'flex' : 'none';
+
+  initCharts(id);
+  return false;
+}
+
+// ═══════════════════════════════════════════
+// CHARTS
+// ═══════════════════════════════════════════
+const CI = {};
+
+function d(id) { if(CI[id]) { CI[id].destroy(); delete CI[id]; } }
+
+function initCharts(page) {
+  if(page === 'overview')    { initOverviewTrend(); initOverviewRisk(); }
+  else if(page === 'workforce')   { initBMI(); }
+  else if(page === 'utilization') { initReferral(); }
+  else if(page === 'cost')        { initPEPM(); initClaimsPie(); }
+  else if(page === 'risk')        { initDept(); }
+}
+
+function initOverviewTrend() {
+  d('overviewTrendChart');
+  const ctx = document.getElementById('overviewTrendChart'); if(!ctx) return;
+  CI['overviewTrendChart'] = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ['Q4 FY24','Q1 FY25','Q2 FY25','Q3 FY25','Q4 FY25','Q1 FY26','Q2 FY26','Q3 FY26'],
+      datasets: [
+        {label:'AHC Completion %', data:[58,60,61,62,63,64,64,64], borderColor:'#00236f', backgroundColor:'rgba(0,35,111,0.05)', borderWidth:2, fill:true, tension:0.4, pointRadius:3, pointBackgroundColor:'#00236f'},
+        {label:'OHC Footfall (visits/100)', data:[34,36,38,40,39,42,44,45], borderColor:'#006c49', backgroundColor:'rgba(0,108,73,0.04)', borderWidth:2, fill:true, tension:0.4, pointRadius:3, pointBackgroundColor:'#006c49'},
+        {label:'Target (AHC)', data:[75,75,75,75,75,75,75,75], borderColor:'#c5c5d3', borderDash:[5,5], borderWidth:1.5, fill:false, tension:0, pointRadius:0}
+      ]
+    },
+    options: {
+      responsive:true,
+      plugins: { legend: { position:'bottom', labels: { font: { size:10, family:'Inter' }, boxWidth:10, color:'#444651' } } },
+      scales: {
+        y: { beginAtZero:false, min:20, ticks: { font:{size:9}, color:'#444651', callback: v => v+'%' }, grid: { color:'rgba(197,197,211,0.2)' } },
+        x: { ticks: { font:{size:9}, color:'#444651' }, grid: { display:false } }
+      }
+    }
+  });
+}
+
+function initOverviewRisk() {
+  d('overviewRiskChart');
+  const ctx = document.getElementById('overviewRiskChart'); if(!ctx) return;
+  CI['overviewRiskChart'] = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Very High','High','Medium','Low'],
+      datasets: [{ data:[312,884,1820,2184], backgroundColor:['#5c0016','#c2410c','#d97706','#006c49'], borderWidth:0, hoverOffset:4 }]
+    },
+    options: { responsive:true, cutout:'72%', plugins: { legend: { display:false } } }
+  });
+}
+
+function initBMI() {
+  d('bmiChart');
+  const ctx = document.getElementById('bmiChart'); if(!ctx) return;
+  CI['bmiChart'] = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['20–30','31–40','41–50','51–60','60+'],
+      datasets: [
+        {label:'Low Risk', data:[380,520,310,180,60], backgroundColor:'#006c49', borderRadius:3, stack:'s'},
+        {label:'Medium Risk', data:[290,380,260,140,45], backgroundColor:'#d97706', borderRadius:3, stack:'s'},
+        {label:'High Risk', data:[120,180,150,80,25], backgroundColor:'#5c0016', borderRadius:3, stack:'s'}
+      ]
+    },
+    options: {
+      responsive:true,
+      plugins: { legend: { position:'bottom', labels: { font:{size:10,family:'Inter'}, boxWidth:10, color:'#444651' } } },
+      scales: {
+        x: { stacked:true, ticks:{font:{size:9},color:'#444651'}, grid:{display:false} },
+        y: { stacked:true, ticks:{font:{size:9},color:'#444651'}, grid:{color:'rgba(197,197,211,0.2)'} }
+      }
+    }
+  });
+}
+
+function initReferral() {
+  d('referralChart');
+  const ctx = document.getElementById('referralChart'); if(!ctx) return;
+  CI['referralChart'] = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['GP Consults','Physiotherapy','Mental Wellness','Dental'],
+      datasets: [{ data:[45,25,20,10], backgroundColor:['#00236f','#006c49','#d97706','#c5c5d3'], borderWidth:0, hoverOffset:4 }]
+    },
+    options: { responsive:true, cutout:'70%', plugins: { legend: { display:false } } }
+  });
+}
+
+function initPEPM() {
+  d('pepmChart');
+  const ctx = document.getElementById('pepmChart'); if(!ctx) return;
+  CI['pepmChart'] = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ['Q4 FY24','Q1 FY25','Q2 FY25','Q3 FY25','Q4 FY25','Q1 FY26','Q2 FY26','Q3 FY26'],
+      datasets: [
+        {label:'Actual PEPM', data:[2120,2190,2250,2380,2420,2540,2680,2847], borderColor:'#00236f', backgroundColor:'rgba(0,35,111,0.05)', borderWidth:2, fill:true, tension:0.4, pointRadius:3, pointBackgroundColor:'#00236f'},
+        {label:'Projected (no intervention)', data:[null,null,null,null,null,null,2680,2920], borderColor:'#5c0016', borderDash:[4,4], borderWidth:1.5, fill:false, tension:0.4, pointRadius:0},
+        {label:'Peer Benchmark', data:[2200,2210,2250,2280,2320,2370,2400,2420], borderColor:'#c5c5d3', borderDash:[5,5], borderWidth:1.5, fill:false, tension:0.4, pointRadius:0}
+      ]
+    },
+    options: {
+      responsive:true,
+      plugins: { legend: { position:'bottom', labels: { font:{size:10,family:'Inter'}, boxWidth:10, color:'#444651' } } },
+      scales: {
+        y: { beginAtZero:false, min:1800, ticks:{font:{size:9},color:'#444651',callback:v=>'₹'+v.toLocaleString()}, grid:{color:'rgba(197,197,211,0.2)'} },
+        x: { ticks:{font:{size:9},color:'#444651'}, grid:{display:false} }
+      }
+    }
+  });
+}
+
+function initClaimsPie() {
+  d('claimsPieChart');
+  const ctx = document.getElementById('claimsPieChart'); if(!ctx) return;
+  CI['claimsPieChart'] = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Cardiac','Maternity','Diabetes','Others'],
+      datasets: [{ data:[28.4,22.5,18.7,15.3], backgroundColor:['#5c0016','#d97706','#c2410c','#c5c5d3'], borderWidth:0, hoverOffset:4 }]
+    },
+    options: { responsive:true, cutout:'68%', plugins: { legend: { display:false } } }
+  });
+}
+
+function initDept() {
+  d('deptChart');
+  const ctx = document.getElementById('deptChart'); if(!ctx) return;
+  CI['deptChart'] = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Engineering','Operations','Finance','HR & Admin','Sales','IT Infra'],
+      datasets: [
+        {label:'Very High', data:[48,72,38,28,54,72], backgroundColor:'#5c0016', borderRadius:3, stack:'s'},
+        {label:'High', data:[142,198,112,84,148,200], backgroundColor:'#c2410c', borderRadius:3, stack:'s'},
+        {label:'Medium', data:[220,310,180,140,220,280], backgroundColor:'#d97706', borderRadius:3, stack:'s'},
+        {label:'Low', data:[390,320,270,248,278,248], backgroundColor:'#006c49', borderRadius:3, stack:'s'}
+      ]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive:true,
+      plugins: { legend: { position:'bottom', labels: { font:{size:9,family:'Inter'}, boxWidth:8, color:'#444651' } } },
+      scales: {
+        x: { stacked:true, ticks:{font:{size:9},color:'#444651'}, grid:{color:'rgba(197,197,211,0.2)'} },
+        y: { stacked:true, ticks:{font:{size:9},color:'#444651'}, grid:{display:false} }
+      }
+    }
+  });
+}
+
+// ═══════════════════════════════════════════
+// AI ASSISTANT
+// ═══════════════════════════════════════════
+const QA = [
+  {
+    kw: ['premium','cost go up','claims go up','why did','increase','went up'],
+    sql: `SELECT diagnosis_category,\n  SUM(claim_amount) as total_inr,\n  COUNT(*) as claim_count\nFROM fact_claims\nWHERE employer_id='techcorp_gcc'\n  AND fy='2025-26'\nGROUP BY diagnosis_category\nORDER BY total_inr DESC`,
+    ans: `Your claims rose 12% (₹13.2Cr → ₹14.8Cr). Three categories drove this:<br><br><b>1. Cardiac ▲38%</b> — ₹28.4L. 5 high-cost admissions, 3 of which are <b>parent dependents on family floaters</b> aged 62–71.<br><br><b>2. Maternity ▲18%</b> — ₹22.1L. C-section rate is 61% vs national avg 48%.<br><br><b>3. Diabetes ▲22%</b> — ₹18.7L. 412 undiagnosed employees are your future cost exposure.<br><br><b>Recommendation:</b> Target the 78 predicted high-cost claimants with care management. Estimated addressable savings: ₹1.8Cr.`
+  },
+  {
+    kw: ['high risk','how many','risk','employees at risk'],
+    sql: `SELECT risk_tier,\n  COUNT(*) as employees,\n  ROUND(COUNT(*)*100.0/5200,1) as pct\nFROM dim_employee\nWHERE employer_id='techcorp_gcc'\nGROUP BY risk_tier\nORDER BY risk_order`,
+    ans: `<b>1,196 employees (23%)</b> are in the high or very-high risk tier — up from 18% last year.<br><br><table style="width:100%;border-collapse:collapse;font-size:12px;"><tr style="background:#f3f4f5;"><th style="text-align:left;padding:6px 8px;font-weight:600;">Tier</th><th style="text-align:right;padding:6px 8px;font-weight:600;">Count</th><th style="text-align:right;padding:6px 8px;font-weight:600;">%</th></tr><tr style="border-top:1px solid #edeeef;"><td style="padding:6px 8px;color:#920028;font-weight:500;">Very High</td><td style="padding:6px 8px;text-align:right;">312</td><td style="padding:6px 8px;text-align:right;">6%</td></tr><tr style="border-top:1px solid #edeeef;"><td style="padding:6px 8px;color:#c2410c;font-weight:500;">High</td><td style="padding:6px 8px;text-align:right;">884</td><td style="padding:6px 8px;text-align:right;">17%</td></tr><tr style="border-top:1px solid #edeeef;"><td style="padding:6px 8px;color:#d97706;">Medium</td><td style="padding:6px 8px;text-align:right;">1,820</td><td style="padding:6px 8px;text-align:right;">35%</td></tr><tr style="border-top:1px solid #edeeef;"><td style="padding:6px 8px;color:#006c49;">Low</td><td style="padding:6px 8px;text-align:right;">2,184</td><td style="padding:6px 8px;text-align:right;">42%</td></tr></table><br>The 312 Very High risk employees account for ~41% of projected claims spend.`
+  },
+  {
+    kw: ['wellness','spend','roi','worth','get for','programme'],
+    sql: `SELECT programme, investment_inr,\n  did_estimate_inr as savings,\n  ci_lower_inr, ci_upper_inr\nFROM analytics.programme_roi\nWHERE employer_id='techcorp_gcc'\n  AND fy='2025-26'`,
+    ans: `Using <b>Difference-in-Differences (DiD)</b> — not naïve before/after, which inflates ROI by 2.5x per the Illinois Workplace Wellness Study (Jones, Molitor &amp; Reif 2019):<br><br><table style="width:100%;border-collapse:collapse;font-size:12px;"><tr><td style="padding:8px;background:#f3f4f5;border-radius:6px;text-align:center;"><span style="font-size:16px;font-weight:700;color:#9ca3af;text-decoration:line-through;">₹3.1 Cr</span><br><span style="color:#ef4444;font-size:10px;">Naïve estimate</span></td><td style="padding:8px;background:#f0fdf4;border-radius:6px;text-align:center;"><span style="font-size:16px;font-weight:700;color:#15803d;">₹1.2 Cr</span><br><span style="color:#166534;font-size:10px;">DiD estimate</span></td><td style="padding:8px;background:#f3f4f5;border-radius:6px;text-align:center;"><span style="font-size:16px;font-weight:700;color:#191c1d;">₹2.7 Cr</span><br><span style="color:#444651;font-size:10px;">Investment</span></td></tr></table><br><b>95% CI: ₹0.8Cr – ₹1.6Cr · ROI: 1.4x</b><br><br>Strongest signal: pre-diabetics 31–45 in nutrition programme (n=284) — 34% reduction in OHC escalation vs matched controls.`
+  },
+  {
+    kw: ['department','business unit','team','riskiest','highest risk'],
+    sql: `SELECT department,\n  SUM(CASE WHEN risk_tier IN ('HIGH','VERY_HIGH')\n    THEN 1 ELSE 0 END) as high_risk,\n  COUNT(*) as total\nFROM dim_employee\nWHERE employer_id='techcorp_gcc'\nGROUP BY department\nORDER BY high_risk/total DESC`,
+    ans: `<b>Operations and IT Infrastructure</b> have the highest concentration of high/very-high risk employees:<br><br><table style="width:100%;border-collapse:collapse;font-size:12px;"><tr style="background:#f3f4f5;"><th style="text-align:left;padding:6px 8px;font-weight:600;">Department</th><th style="text-align:right;padding:6px 8px;font-weight:600;">High+VH</th><th style="text-align:right;padding:6px 8px;font-weight:600;">%</th></tr><tr style="border-top:1px solid #edeeef;"><td style="padding:6px 8px;font-weight:500;color:#920028;">Operations</td><td style="padding:6px 8px;text-align:right;">270</td><td style="padding:6px 8px;text-align:right;">31%</td></tr><tr style="border-top:1px solid #edeeef;"><td style="padding:6px 8px;font-weight:500;color:#920028;">IT Infra</td><td style="padding:6px 8px;text-align:right;">272</td><td style="padding:6px 8px;text-align:right;">29%</td></tr><tr style="border-top:1px solid #edeeef;"><td style="padding:6px 8px;color:#c2410c;">Sales</td><td style="padding:6px 8px;text-align:right;">202</td><td style="padding:6px 8px;text-align:right;">27%</td></tr><tr style="border-top:1px solid #edeeef;"><td style="padding:6px 8px;">Engineering</td><td style="padding:6px 8px;text-align:right;">190</td><td style="padding:6px 8px;text-align:right;">18%</td></tr></table><br><b>Root cause (Operations):</b> Sedentary roles, night shift patterns, higher BMI prevalence.`
+  },
+  {
+    kw: ['compare','benchmark','peer','gcc','industry'],
+    sql: `SELECT metric, our_value, peer_median,\n  percentile_rank\nFROM analytics.benchmark\nWHERE employer_id='techcorp_gcc'\n  AND benchmark_group='GCC_India_5000+'`,
+    ans: `Your standing vs. India GCC peer group (5,000+ employees):<br><br><table style="width:100%;border-collapse:collapse;font-size:12px;"><tr style="background:#f3f4f5;"><th style="text-align:left;padding:6px 8px;font-weight:600;">Metric</th><th style="text-align:right;padding:6px 8px;font-weight:600;">TechCorp</th><th style="text-align:right;padding:6px 8px;font-weight:600;">Peer Median</th><th style="text-align:right;padding:6px 8px;font-weight:600;">Status</th></tr><tr style="border-top:1px solid #edeeef;"><td style="padding:6px 8px;">Claims PEPM</td><td style="padding:6px 8px;text-align:right;">₹2,847</td><td style="padding:6px 8px;text-align:right;">₹2,420</td><td style="padding:6px 8px;text-align:right;color:#5c0016;">↑ 17% above</td></tr><tr style="border-top:1px solid #edeeef;"><td style="padding:6px 8px;">AHC Completion</td><td style="padding:6px 8px;text-align:right;">64%</td><td style="padding:6px 8px;text-align:right;">72%</td><td style="padding:6px 8px;text-align:right;color:#d97706;">↑ Slightly below</td></tr><tr style="border-top:1px solid #edeeef;"><td style="padding:6px 8px;">High-risk %</td><td style="padding:6px 8px;text-align:right;">23%</td><td style="padding:6px 8px;text-align:right;">21%</td><td style="padding:6px 8px;text-align:right;color:#d97706;">↑ Slightly above</td></tr><tr style="border-top:1px solid #edeeef;"><td style="padding:6px 8px;">eNPS (Benefits)</td><td style="padding:6px 8px;text-align:right;">+34</td><td style="padding:6px 8px;text-align:right;">+28</td><td style="padding:6px 8px;text-align:right;color:#006c49;">✓ Top quartile</td></tr><tr style="border-top:1px solid #edeeef;"><td style="padding:6px 8px;">Loss Ratio</td><td style="padding:6px 8px;text-align:right;">68%</td><td style="padding:6px 8px;text-align:right;">71%</td><td style="padding:6px 8px;text-align:right;color:#006c49;">✓ Favourable</td></tr></table>`
+  }
+];
+
+function askQ(q) {
+  document.getElementById('chatInput').value = q;
+  sendMsg();
+}
+
+function sendMsg() {
+  const inp = document.getElementById('chatInput');
+  const q = inp.value.trim();
+  if(!q) return;
+  addUserMsg(q);
+  inp.value = '';
+  const tid = addTyping();
+  setTimeout(() => {
+    removeTyping(tid);
+    const r = findAnswer(q);
+    addAIMsg(r.sql, r.ans);
+  }, 1600);
+}
+
+function findAnswer(q) {
+  const lq = q.toLowerCase();
+  for(const qa of QA) {
+    if(qa.kw.some(k => lq.includes(k))) {
+      document.getElementById('sqlPreview').innerHTML = qa.sql.replace(/\n/g,'<br>').replace(/ /g,'&nbsp;');
+      return qa;
+    }
+  }
+  const sql = `SELECT metric, value\nFROM analytics.summary\nWHERE employer_id = 'techcorp_gcc'`;
+  document.getElementById('sqlPreview').innerHTML = sql.replace(/\n/g,'<br>');
+  return { sql, ans: `Your workforce has <b>5,200 employees</b> with claims PEPM ₹2,847 and 23% high-risk. Try: "Why did our premium go up?", "How many are high risk?", or "What is our wellness ROI?"` };
+}
+
+function addUserMsg(txt) {
+  const c = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'chat-msg flex justify-end';
+  div.innerHTML = `<div style="background:#00236f;color:white;border-radius:1rem;border-top-right-radius:0.125rem;" class="px-4 py-2.5 max-w-md text-sm">${esc(txt)}</div>`;
+  c.appendChild(div);
+  c.scrollTop = c.scrollHeight;
+}
+
+function addAIMsg(sql, ans) {
+  const c = document.getElementById('chatMessages');
+  const div = document.createElement('div');
+  div.className = 'chat-msg flex gap-3';
+  div.innerHTML = `
+    <div style="width:28px;height:28px;background:#00236f;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:11px;flex-shrink:0;margin-top:2px;">AI</div>
+    <div class="flex-1" style="max-width:520px;">
+      <div style="background:#f3f4f5;border-radius:1rem;border-top-left-radius:0.125rem;padding:1rem;" class="text-sm text-on-surface-variant">${ans}</div>
+      <div style="margin-top:8px;background:#18181b;border-radius:0.75rem;padding:10px 12px;">
+        <div style="color:#6b7280;font-size:10px;margin-bottom:4px;">Query executed · zero PHI sent</div>
+        <div style="color:#4ade80;font-size:11px;font-family:monospace;line-height:1.5;">${sql.replace(/\n/g,'<br>').replace(/ /g,'&nbsp;')}</div>
+      </div>
+      <div style="margin-top:6px;display:flex;align-items:center;gap:8px;">
+        <span style="background:#6cf8bb;color:#00714d;border-radius:9999px;font-size:11px;padding:2px 8px;font-weight:500;">PHI NEVER LEFT PERIMETER</span>
+        <span style="color:#444651;font-size:11px;cursor:pointer;text-decoration:underline;">VIEW GENERATED SQL QUERY ▼</span>
+      </div>
+    </div>`;
+  c.appendChild(div);
+  c.scrollTop = c.scrollHeight;
+}
+
+function addTyping() {
+  const c = document.getElementById('chatMessages');
+  const id = 't' + Date.now();
+  const div = document.createElement('div');
+  div.id = id;
+  div.className = 'chat-msg flex gap-3';
+  div.innerHTML = `
+    <div style="width:28px;height:28px;background:#00236f;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:11px;flex-shrink:0;">AI</div>
+    <div style="background:#f3f4f5;border-radius:1rem;border-top-left-radius:0.125rem;padding:12px 16px;display:flex;align-items:center;gap:8px;">
+      <span style="font-size:12px;color:#444651;">● QUERYING SEMANTIC LAYER</span>
+      <div style="display:flex;gap:3px;">
+        <div class="dot" style="width:6px;height:6px;background:#c5c5d3;border-radius:50%;"></div>
+        <div class="dot" style="width:6px;height:6px;background:#c5c5d3;border-radius:50%;"></div>
+        <div class="dot" style="width:6px;height:6px;background:#c5c5d3;border-radius:50%;"></div>
+      </div>
+    </div>`;
+  c.appendChild(div);
+  c.scrollTop = c.scrollHeight;
+  return id;
+}
+
+function removeTyping(id) {
+  const el = document.getElementById(id);
+  if(el) el.remove();
+}
+
+function esc(t) {
+  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => initCharts('overview'), 100);
+  renderToggles();
+  renderConfig('techcorp');
+  applyModuleVisibility();
+});
+</script>
+</body>
+</html>
