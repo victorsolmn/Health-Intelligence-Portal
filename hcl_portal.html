@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1173,11 +1173,11 @@ input:checked + .slider:before { transform: translateX(20px); }
         <div class="text-xs text-on-surface-variant mt-3">Configure in <span class="text-primary font-medium cursor-pointer" onclick="showPage('settings',document.querySelector('[onclick*=settings]'))">Settings →</span></div>
       </div>
 
-      <!-- SQL Preview -->
-      <div class="bg-zinc-900 rounded-xl p-4">
-        <div class="text-[10px] uppercase tracking-widest mb-2" style="color:#6b7280;">Last Generated Query</div>
-        <div id="sqlPreview" class="text-xs font-mono leading-5" style="color:#4ade80;">
-          SELECT risk_tier,<br>&nbsp; COUNT(*) as employees<br>FROM dim_employee<br>WHERE employer_id = 'techcorp_gcc'<br>GROUP BY risk_tier
+      <!-- Suggested Next Questions -->
+      <div class="rounded-xl p-4" style="background:#f3f4f5;">
+        <div class="text-[10px] uppercase tracking-widest mb-3" style="color:#6b7280;">Suggested Next Questions</div>
+        <div id="suggestedQuestions" class="flex flex-col gap-2">
+          <div class="text-xs text-on-surface-variant italic">Ask a question to see contextual follow-ups.</div>
         </div>
       </div>
 
@@ -1190,133 +1190,185 @@ input:checked + .slider:before { transform: translateX(20px); }
 <!-- ═══════════════════════════════════════════
      PAGE 7: DATA PRODUCTS
 ═══════════════════════════════════════════ -->
-<div id="page-dataproducts" class="page-section p-6">
-  <div class="mb-6">
-    <h1 class="text-3xl font-bold tracking-tight text-on-surface">Advanced ML Data Products</h1>
-    <p class="text-sm text-on-surface-variant mt-1">Three high-value ML products enabled exclusively by combining AHC + OHC + Claims datasets.</p>
+<div id="page-dataproducts" class="page-section" style="padding:0;background:#f8f9fb;">
+
+  <!-- Hero Header -->
+  <div style="text-align:center;padding:48px 40px 36px;">
+    <div style="display:flex;justify-content:center;gap:8px;margin-bottom:16px;">
+      <span style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;background:#e0e8ff;color:#00236f;padding:4px 12px;border-radius:999px;">3 Products Live</span>
+      <span style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;background:#e5e7eb;color:#6b7280;padding:4px 12px;border-radius:999px;">Internal View</span>
+    </div>
+    <h1 style="font-size:2.4rem;font-weight:800;color:#0f172a;margin:0 0 12px;letter-spacing:-0.02em;">Advanced Health Analytics Suite</h1>
+    <p style="font-size:1rem;color:#64748b;margin:0 auto;max-width:560px;line-height:1.6;">Turn clinical and claims data into actionable financial and wellness intelligence. Three products possible only by combining AHC + Claims.</p>
+  </div>
+
+  <!-- Data Fusion Banner -->
+  <div style="background:#fff;border-top:1px solid #e5e7eb;border-bottom:1px solid #e5e7eb;padding:16px 40px;">
+    <div style="display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:center;gap:12px;max-width:860px;margin:0 auto;font-size:12px;">
+      <div style="text-align:center;padding:10px 14px;background:#eff6ff;border-radius:10px;border:1px solid #bfdbfe;">
+        <div style="font-weight:700;color:#1e40af;margin-bottom:4px;">AHC Data Alone</div>
+        <div style="color:#3b82f6;line-height:1.5;">Labs, BMI, vitals<br><span style="color:#93c5fd;">No cost context</span></div>
+      </div>
+      <div style="font-size:20px;color:#94a3b8;font-weight:700;text-align:center;">+</div>
+      <div style="text-align:center;padding:10px 14px;background:#faf5ff;border-radius:10px;border:1px solid #e9d5ff;">
+        <div style="font-weight:700;color:#6b21a8;margin-bottom:4px;">Claims Data Alone</div>
+        <div style="color:#9333ea;line-height:1.5;">ICD-10, PEPM, cost<br><span style="color:#c4b5fd;">Reactive only</span></div>
+      </div>
+      <div style="font-size:20px;color:#94a3b8;font-weight:700;text-align:center;">→</div>
+      <div style="text-align:center;padding:10px 14px;background:#f0fdf4;border-radius:10px;border:1px solid #86efac;">
+        <div style="font-weight:700;color:#166534;margin-bottom:4px;">Combined → 3 Products</div>
+        <div style="color:#16a34a;line-height:1.5;">Predict · Surface · Attribute<br><span style="color:#4ade80;">Before cost events occur</span></div>
+      </div>
+    </div>
   </div>
 
   <!-- Product Cards -->
-  <div class="space-y-4 mb-6">
-    <!-- Card 1: HICC -->
-    <div class="rounded-xl overflow-hidden shadow-ambient-md">
-      <div class="grid grid-cols-3 min-h-48" style="background:linear-gradient(135deg,#1e3a8a,#00236f);">
-        <div class="col-span-2 p-6 text-white">
-          <div class="text-[10px] uppercase tracking-widest mb-2" style="color:rgba(255,255,255,0.6);">Product 01</div>
-          <h3 class="text-xl font-bold mb-2">High-Cost Claimant (HiCC) Prediction Engine</h3>
-          <p class="text-sm mb-4" style="color:rgba(255,255,255,0.8);">Binary classifier predicting which employees will become high-cost claimants (>₹5L) in the next 12 months. AUC 0.89 on validation. Enables targeted care management at highest-ROI cohort.</p>
-          <div class="flex gap-2 mb-4">
-            <span class="bg-white/20 text-white text-[10px] uppercase tracking-widest px-2 py-1 rounded-full font-medium">XGBOOST/LIGHTGBM</span>
-            <span class="bg-white/20 text-white text-[10px] uppercase tracking-widest px-2 py-1 rounded-full font-medium">SHAP EXPLANATIONS</span>
-          </div>
-          <p class="text-xs italic" style="color:rgba(255,255,255,0.7);">"HbA1c trajectory across 2 consecutive AHCs + zero diabetes claims = undiagnosed diabetic who will hospitalise in 18 months — a signal that only exists with both datasets."</p>
-        </div>
-        <div class="relative overflow-hidden" style="background:linear-gradient(135deg,#0a1628,#00236f);">
-          <div class="absolute inset-0 flex items-center justify-center">
-            <div class="text-center text-white/30">
-              <div class="text-6xl font-black tracking-tight">AUC</div>
-              <div class="text-4xl font-bold">0.89</div>
-              <div class="text-sm mt-2 opacity-60">Validation Score</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+  <div style="padding:40px 40px 0;max-width:1100px;margin:0 auto;"><!-- cards-wrapper -->
+    <!-- 3 Product Cards -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:24px;align-items:start;">
 
-    <!-- Card 2: Undiagnosed -->
-    <div class="rounded-xl overflow-hidden shadow-ambient-md">
-      <div class="grid grid-cols-3 min-h-48" style="background:linear-gradient(135deg,#1c1917,#292524);">
-        <div class="col-span-2 p-6 text-white">
-          <div class="text-[10px] uppercase tracking-widest mb-2" style="color:rgba(255,255,255,0.6);">Product 02</div>
-          <h3 class="text-xl font-bold mb-2">Undiagnosed Chronic Disease Surfacing</h3>
-          <p class="text-sm mb-4" style="color:rgba(255,255,255,0.8);">Identifies employees whose AHC lab values strongly indicate a condition but who have zero corresponding ICD-10 code in claims. 1 in 4 employees under 35 have undiagnosed metabolic conditions.</p>
-          <div class="flex gap-2 mb-4">
-            <span class="bg-white/20 text-white text-[10px] uppercase tracking-widest px-2 py-1 rounded-full font-medium">PU LEARNING</span>
-            <span class="bg-white/20 text-white text-[10px] uppercase tracking-widest px-2 py-1 rounded-full font-medium">ANOMALY DETECTION</span>
-          </div>
-          <p class="text-xs italic" style="color:rgba(255,255,255,0.7);">"412 employees match pre-diabetic pattern — at ₹93K avg annual cost per diagnosed diabetic, that is ₹38.4L in projected exposure if unaddressed."</p>
+      <!-- Card 1: HiCC Predictor -->
+      <div style="background:#fff;border-radius:16px;border:1px solid #e2e8f0;box-shadow:0 2px 12px rgba(0,0,0,0.06);padding:28px 24px;display:flex;flex-direction:column;gap:16px;">
+        <div>
+          <h3 style="font-size:1.25rem;font-weight:800;color:#0f172a;margin:0 0 4px;">HiCC Predictor</h3>
+          <p style="font-size:12px;color:#94a3b8;margin:0;">High-Cost Claimant Prediction Engine</p>
         </div>
-        <div class="relative overflow-hidden" style="background:linear-gradient(135deg,#0c0a09,#1c1917);">
-          <div class="absolute inset-0 flex items-center justify-center">
-            <div class="text-center text-white/30">
-              <div class="text-6xl font-black tracking-tight">412</div>
-              <div class="text-sm mt-2 opacity-60">Undiagnosed<br>Employees</div>
-            </div>
+        <p style="font-size:13px;color:#475569;line-height:1.6;margin:0;">Predictive intelligence identifying the top 1.5% of employees projected to incur &gt;₹5L in the next 12 months — 6 to 18 months before the cost event occurs.</p>
+        <div>
+          <p style="font-size:13px;font-weight:700;color:#0f172a;margin:0 0 4px;">Key Value</p>
+          <p style="font-size:13px;color:#475569;line-height:1.6;margin:0;">Risk-banded cohort reports for Benefits Heads and CFOs to manage multi-crore renewal exposure before it crystallises. AUC 0.89 validated.</p>
+        </div>
+        <div>
+          <p style="font-size:13px;font-weight:700;color:#0f172a;margin:0 0 8px;">Features</p>
+          <ul style="margin:0;padding-left:18px;font-size:13px;color:#475569;line-height:1.8;">
+            <li>Longitudinal AHC + Claims delta features</li>
+            <li>LightGBM modelling · SHAP explainability</li>
+            <li>Monthly retrain · Precision@K optimised</li>
+          </ul>
+        </div>
+        <div style="margin-top:auto;">
+          <button onclick="toggleDetail('d1')" style="background:none;border:none;color:#00236f;font-size:13px;font-weight:600;cursor:pointer;padding:0;margin-bottom:14px;text-decoration:none;">Learn More ↓</button>
+          <div id="d1" style="display:none;margin-bottom:14px;font-size:12px;color:#475569;line-height:1.7;background:#f8fafc;border-radius:10px;padding:12px 14px;border:1px solid #e2e8f0;">
+            <strong style="color:#0f172a;">Model:</strong> LightGBM (faster + native categorical support for ICD-10 vs XGBoost). Isotonic regression for probability calibration.<br>
+            <strong style="color:#0f172a;">Stack:</strong> Python · LightGBM · SHAP · MLflow · FastAPI (VPC) · Evidently AI · Airflow<br>
+            <strong style="color:#0f172a;">Privacy:</strong> Tripartite DPA (Employer + Insurer + HCL). SHA-256 pseudonymised join. Employer receives aggregate risk counts only. DPDP 2023 compliant.<br>
+            <strong style="color:#0f172a;">Benchmark:</strong> Maisog et al. 2019 AUC 0.912 · Target ≥ 0.85 for Indian dataset.
           </div>
+          <button style="width:100%;background:#00236f;color:#fff;border:none;border-radius:10px;padding:13px 0;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:0.01em;">Connect with Our Team</button>
         </div>
       </div>
-    </div>
 
-    <!-- Card 3: Causal ROI -->
-    <div class="rounded-xl overflow-hidden shadow-ambient-md">
-      <div class="grid grid-cols-3 min-h-48" style="background:linear-gradient(135deg,#052e16,#14532d);">
-        <div class="col-span-2 p-6 text-white">
-          <div class="text-[10px] uppercase tracking-widest mb-2" style="color:rgba(255,255,255,0.6);">Product 03</div>
-          <h3 class="text-xl font-bold mb-2">Causal Programme ROI Engine (Uplift Modelling)</h3>
-          <p class="text-sm mb-4" style="color:rgba(255,255,255,0.8);">Uses Difference-in-Differences and Causal Forests to rigorously estimate programme ROI — not naïve before/after. Identifies which sub-groups actually benefit from specific interventions.</p>
-          <div class="flex gap-2 mb-4">
-            <span class="bg-white/20 text-white text-[10px] uppercase tracking-widest px-2 py-1 rounded-full font-medium">CAUSAL INFERENCE</span>
-            <span class="bg-white/20 text-white text-[10px] uppercase tracking-widest px-2 py-1 rounded-full font-medium">ECONML</span>
-          </div>
-          <p class="text-xs italic" style="color:rgba(255,255,255,0.7);">"The nutrition programme worked for 31–45 pre-diabetics (CATE: –₹18,400/person/year) but not for 46+ employees already on medication."</p>
+      <!-- Card 2: Silent Disease Discovery (FEATURED) -->
+      <div style="background:#fff;border-radius:16px;border:2px solid #00236f;box-shadow:0 8px 32px rgba(0,35,111,0.14);padding:28px 24px;display:flex;flex-direction:column;gap:16px;position:relative;">
+        <div style="position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:#00236f;color:#fff;font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:4px 14px;border-radius:999px;white-space:nowrap;">Most Impactful</div>
+        <div>
+          <h3 style="font-size:1.25rem;font-weight:800;color:#0f172a;margin:0 0 4px;">Silent Disease Discovery</h3>
+          <p style="font-size:12px;color:#94a3b8;margin:0;">Undiagnosed Chronic Disease Surfacing</p>
         </div>
-        <div class="relative overflow-hidden" style="background:linear-gradient(135deg,#021a0b,#052e16);">
-          <div class="absolute inset-0 flex items-center justify-center">
-            <div class="text-center text-white/30">
-              <div class="text-5xl font-black tracking-tight">1.4x</div>
-              <div class="text-sm mt-2 opacity-60">Validated ROI</div>
-            </div>
+        <p style="font-size:13px;color:#475569;line-height:1.6;margin:0;">Identifies the "hidden sick" — employees with abnormal AHC lab results but zero corresponding ICD-10 diagnosis in claims. 1 in 4 employees under 35 are affected.</p>
+        <div>
+          <p style="font-size:13px;font-weight:700;color:#0f172a;margin:0 0 4px;">Key Value</p>
+          <p style="font-size:13px;color:#475569;line-height:1.6;margin:0;">Early intervention ROI by catching pre-diabetic and hypertensive markers before claims occur. 412 employees at TechCorp = ₹38.4L projected exposure.</p>
+        </div>
+        <div>
+          <p style="font-size:13px;font-weight:700;color:#0f172a;margin:0 0 8px;">Features</p>
+          <ul style="margin:0;padding-left:18px;font-size:13px;color:#475569;line-height:1.8;">
+            <li>Two-stage PU Learning — not standard supervised</li>
+            <li>South Asian-specific clinical thresholds</li>
+            <li>Automated wellness nudges · Aggregate output only</li>
+          </ul>
+        </div>
+        <div style="margin-top:auto;">
+          <button onclick="toggleDetail('d2')" style="background:none;border:none;color:#00236f;font-size:13px;font-weight:600;cursor:pointer;padding:0;margin-bottom:14px;">Learn More ↓</button>
+          <div id="d2" style="display:none;margin-bottom:14px;font-size:12px;color:#475569;line-height:1.7;background:#f8fafc;border-radius:10px;padding:12px 14px;border:1px solid #e2e8f0;">
+            <strong style="color:#0f172a;">Why PU Learning:</strong> "No ICD-10 claim" ≠ healthy — it's a missing label, not a negative. Standard supervised learning treats undiagnosed as healthy (wrong). PU Learning trains on confirmed positives vs unlabelled.<br>
+            <strong style="color:#0f172a;">Stack:</strong> Python · XGBoost · PU-learn · MLflow · Annual AHC cycle trigger<br>
+            <strong style="color:#0f172a;">Privacy:</strong> Individual scores go to employee wellness app only — never HR. Employer sees aggregate counts per condition category. DPDP compliant.<br>
+            <strong style="color:#0f172a;">Validation:</strong> Precision@100 target ≥40% vs baseline 8% (random).
           </div>
+          <button style="width:100%;background:#00236f;color:#fff;border:none;border-radius:10px;padding:13px 0;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:0.01em;">Connect with Our Team</button>
         </div>
       </div>
-    </div>
-  </div>
+
+      <!-- Card 3: Causal ROI Engine -->
+      <div style="background:#fff;border-radius:16px;border:1px solid #e2e8f0;box-shadow:0 2px 12px rgba(0,0,0,0.06);padding:28px 24px;display:flex;flex-direction:column;gap:16px;">
+        <div>
+          <h3 style="font-size:1.25rem;font-weight:800;color:#0f172a;margin:0 0 4px;">Causal ROI Engine</h3>
+          <p style="font-size:12px;color:#94a3b8;margin:0;">Statistical Attribution</p>
+        </div>
+        <p style="font-size:13px;color:#475569;line-height:1.6;margin:0;">Causal inference to prove actual claims savings from wellness programmes — not naïve before/after, which inflates ROI by 2.5×. Identifies which sub-groups truly benefit.</p>
+        <div>
+          <p style="font-size:13px;font-weight:700;color:#0f172a;margin:0 0 4px;">Key Value</p>
+          <p style="font-size:13px;color:#475569;line-height:1.6;margin:0;">Moves beyond correlation to show CFOs the actual ₹ saved per participant with 95% CI. ₹1.2Cr validated vs ₹3.1Cr naïve estimate. Validation Institute ready.</p>
+        </div>
+        <div>
+          <p style="font-size:13px;font-weight:700;color:#0f172a;margin:0 0 8px;">Features</p>
+          <ul style="margin:0;padding-left:18px;font-size:13px;color:#475569;line-height:1.8;">
+            <li>Difference-in-Differences (DiD)</li>
+            <li>Causal Forests / EconML for sub-group CATE</li>
+            <li>DoWhy + CausalML frameworks</li>
+          </ul>
+        </div>
+        <div style="margin-top:auto;">
+          <button onclick="toggleDetail('d3')" style="background:none;border:none;color:#00236f;font-size:13px;font-weight:600;cursor:pointer;padding:0;margin-bottom:14px;">Learn More ↓</button>
+          <div id="d3" style="display:none;margin-bottom:14px;font-size:12px;color:#475569;line-height:1.7;background:#f8fafc;border-radius:10px;padding:12px 14px;border:1px solid #e2e8f0;">
+            <strong style="color:#0f172a;">Three methods:</strong> DiD (ongoing programmes), Synthetic Control (new rollouts), Causal Forests/CATE (which cohorts benefit most).<br>
+            <strong style="color:#0f172a;">Stack:</strong> Python · EconML · DoWhy · CausalML · MLflow · Semi-annual refresh<br>
+            <strong style="color:#0f172a;">Privacy:</strong> DiD operates on cohort-level aggregates. Minimum 30 employees per CATE cell (k-anonymity). Tripartite DPA for claims outcome data.<br>
+            <strong style="color:#0f172a;">Citation:</strong> Jones, Molitor & Reif (2019) Illinois Workplace Wellness Study.
+          </div>
+          <button style="width:100%;background:#00236f;color:#fff;border:none;border-radius:10px;padding:13px 0;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:0.01em;">Connect with Our Team</button>
+        </div>
+      </div>
+
+    </div><!-- end 3-column grid -->
+  </div><!-- end cards-wrapper -->
 
   <!-- Pipeline Status -->
-  <div class="card p-5">
-    <div class="grid grid-cols-2 gap-6">
-      <div>
-        <div class="text-[10px] uppercase tracking-widest text-on-surface-variant mb-3">Quarterly Innovation Cycle</div>
-        <div class="flex gap-4 mb-4">
-          <div>
-            <div class="text-2xl font-bold tracking-tight text-on-surface">94.2%</div>
-            <div class="text-xs text-on-surface-variant">Precision Score</div>
+  <div style="padding:36px 40px 40px;max-width:1100px;margin:0 auto;">
+    <div style="background:#fff;border-radius:16px;border:1px solid #e2e8f0;box-shadow:0 2px 8px rgba(0,0,0,0.04);padding:28px 32px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;">
+        <div>
+          <p style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#94a3b8;margin:0 0 16px;">Production Pipeline Status</p>
+          <div style="display:flex;gap:32px;margin-bottom:20px;">
+            <div><div style="font-size:1.6rem;font-weight:800;color:#0f172a;">94.2%</div><div style="font-size:11px;color:#94a3b8;">Precision Score</div></div>
+            <div style="width:1px;background:#e2e8f0;"></div>
+            <div><div style="font-size:1.6rem;font-weight:800;color:#0f172a;">₹12.4 Cr</div><div style="font-size:11px;color:#94a3b8;">Quarterly Savings</div></div>
           </div>
-          <div class="w-px bg-outline-variant/40"></div>
-          <div>
-            <div class="text-2xl font-bold tracking-tight text-on-surface">₹12.4 Cr</div>
-            <div class="text-xs text-on-surface-variant">Quarterly Savings</div>
-          </div>
-        </div>
-        <div class="bg-surface-container-low rounded-xl p-3">
-          <div class="text-xs font-semibold text-on-surface mb-2">Production Pipeline</div>
-          <div class="space-y-2 text-xs text-on-surface-variant">
-            <div class="flex items-center gap-2"><span class="w-2 h-2 bg-secondary rounded-full"></span>HiCC Model v2.1 — Live · Retrained monthly</div>
-            <div class="flex items-center gap-2"><span class="w-2 h-2 bg-secondary rounded-full"></span>Undiagnosed Detection — Live · PU Learning</div>
-            <div class="flex items-center gap-2"><span class="w-2 h-2 bg-secondary rounded-full"></span>Causal ROI Engine — Live · Quarterly refresh</div>
+          <div style="background:#f8fafc;border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:#475569;"><span style="width:7px;height:7px;border-radius:50%;background:#22c55e;flex-shrink:0;"></span>HiCC Model v2.1 — Live · Monthly retrain via Airflow</div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:#475569;"><span style="width:7px;height:7px;border-radius:50%;background:#22c55e;flex-shrink:0;"></span>Undiagnosed Detection — Live · Annual AHC cycle trigger</div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:#475569;"><span style="width:7px;height:7px;border-radius:50%;background:#22c55e;flex-shrink:0;"></span>Causal ROI Engine — Live · Semi-annual refresh</div>
           </div>
         </div>
-      </div>
-      <div>
-        <div class="text-[10px] uppercase tracking-widest text-on-surface-variant mb-3">Upcoming Assets</div>
-        <div class="space-y-2.5 text-sm">
-          <div class="flex items-center gap-3 p-3 bg-surface-container-low rounded-xl">
-            <span class="material-symbols-outlined text-on-surface-variant" style="font-size:18px;">psychology</span>
-            <div><div class="font-medium text-on-surface">Mental Health Triage Model</div><div class="text-xs text-on-surface-variant">NLP on EAP sessions · Q2 2026</div></div>
-          </div>
-          <div class="flex items-center gap-3 p-3 bg-surface-container-low rounded-xl">
-            <span class="material-symbols-outlined text-on-surface-variant" style="font-size:18px;">schedule</span>
-            <div><div class="font-medium text-on-surface">Wait-time Optimizer</div><div class="text-xs text-on-surface-variant">OHC scheduling efficiency · Q3 2026</div></div>
-          </div>
-          <div class="flex items-center gap-3 p-3 bg-surface-container-low rounded-xl">
-            <span class="material-symbols-outlined text-on-surface-variant" style="font-size:18px;">hub</span>
-            <div><div class="font-medium text-on-surface">Fiscal Network Analysis</div><div class="text-xs text-on-surface-variant">Provider fraud detection · Q3 2026</div></div>
+        <div>
+          <p style="font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#94a3b8;margin:0 0 16px;">Upcoming Products</p>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:#f8fafc;border-radius:10px;">
+              <span class="material-symbols-outlined" style="font-size:18px;color:#94a3b8;">psychology</span>
+              <div><div style="font-size:13px;font-weight:600;color:#0f172a;">Mental Health Triage Model</div><div style="font-size:11px;color:#94a3b8;">NLP on EAP sessions · Q2 2026</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:#f8fafc;border-radius:10px;">
+              <span class="material-symbols-outlined" style="font-size:18px;color:#94a3b8;">schedule</span>
+              <div><div style="font-size:13px;font-weight:600;color:#0f172a;">Wait-time Optimizer</div><div style="font-size:11px;color:#94a3b8;">OHC scheduling efficiency · Q3 2026</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:#f8fafc;border-radius:10px;">
+              <span class="material-symbols-outlined" style="font-size:18px;color:#94a3b8;">hub</span>
+              <div><div style="font-size:13px;font-weight:600;color:#0f172a;">Provider Fraud Detection</div><div style="font-size:11px;color:#94a3b8;">Network analysis on claims · Q3 2026</div></div>
+            </div>
           </div>
         </div>
-        <a href="#" class="text-xs text-primary font-semibold hover:underline mt-3 inline-block">VIEW ROADMAP →</a>
       </div>
     </div>
   </div>
+
+  <script>
+  function toggleDetail(id) {
+    var el = document.getElementById(id);
+    el.style.display = el.style.display === 'none' ? 'block' : 'none';
+  }
+  </script>
+
 </div>
 
 <!-- ═══════════════════════════════════════════
@@ -1868,6 +1920,74 @@ const QA = [
   }
 ];
 
+const QA_CHARTS = [
+  { title: 'Claims Increase by Category (₹L)', data: [
+    { label: 'Cardiac', value: 28.4, color: '#920028', tag: '▲38%' },
+    { label: 'Maternity', value: 22.1, color: '#c2410c', tag: '▲18%' },
+    { label: 'Diabetes', value: 18.7, color: '#d97706', tag: '▲22%' }
+  ]},
+  { title: 'Risk Tier Distribution', data: [
+    { label: 'Very High', value: 6, color: '#920028', tag: '312 employees' },
+    { label: 'High', value: 17, color: '#c2410c', tag: '884 employees' },
+    { label: 'Medium', value: 35, color: '#d97706', tag: '1,820 employees' },
+    { label: 'Low', value: 42, color: '#006c49', tag: '2,184 employees' }
+  ]},
+  { title: 'Wellness Programme Financials (₹Cr)', data: [
+    { label: 'Investment', value: 2.7, color: '#3b82f6', tag: '₹2.7Cr' },
+    { label: 'Naïve estimate', value: 3.1, color: '#9ca3af', tag: '₹3.1Cr (inflated)' },
+    { label: 'DiD savings (actual)', value: 1.2, color: '#15803d', tag: '₹1.2Cr · ROI 1.4x' }
+  ]},
+  { title: 'High Risk % by Department', data: [
+    { label: 'Operations', value: 31, color: '#920028', tag: '31%' },
+    { label: 'IT Infra', value: 29, color: '#920028', tag: '29%' },
+    { label: 'Sales', value: 27, color: '#c2410c', tag: '27%' },
+    { label: 'Engineering', value: 18, color: '#d97706', tag: '18%' }
+  ]},
+  { title: 'vs GCC India Peer Median', data: [
+    { label: 'Claims PEPM', value: 85, color: '#920028', tag: '17% above peer' },
+    { label: 'AHC Completion', value: 60, color: '#d97706', tag: 'Below peer (64% vs 72%)' },
+    { label: 'eNPS (Benefits)', value: 95, color: '#006c49', tag: 'Top quartile (+34)' },
+    { label: 'Loss Ratio', value: 90, color: '#006c49', tag: 'Favourable (68% vs 71%)' }
+  ]}
+];
+
+const QA_FOLLOWUPS = [
+  ['Which department has the highest claims?', 'How many employees are high risk?', 'What is our wellness ROI?'],
+  ['Which department has the most high-risk employees?', 'What drove our premium increase?', 'How do we compare to peers?'],
+  ['What is the ROI breakdown by programme?', 'How many high-risk employees do we have?', 'Compare us to peer benchmarks'],
+  ['What is the risk profile of Operations?', 'How many are very high risk?', 'Why did our premium go up?'],
+  ['Why is our claims PEPM above peer?', 'What can improve our AHC completion rate?', 'How many employees are high risk?']
+];
+
+function buildChart(chart) {
+  if (!chart) return '';
+  const max = Math.max(...chart.data.map(d => d.value));
+  const bars = chart.data.map(d => {
+    const pct = Math.max(8, Math.round((d.value / max) * 100));
+    return `<div style="margin-bottom:8px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
+        <span style="font-size:11px;color:#374151;">${d.label}</span>
+        <span style="font-size:10px;color:${d.color};font-weight:600;">${d.tag}</span>
+      </div>
+      <div style="height:5px;background:#e5e7eb;border-radius:3px;overflow:hidden;">
+        <div style="height:100%;width:${pct}%;background:${d.color};border-radius:3px;"></div>
+      </div>
+    </div>`;
+  }).join('');
+  return `<div style="background:#fff;border-radius:8px;padding:10px 12px;margin-top:10px;border:1px solid #e5e7eb;">
+    <div style="font-size:10px;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">${chart.title}</div>
+    ${bars}
+  </div>`;
+}
+
+function updateSuggestedQuestions(questions) {
+  const el = document.getElementById('suggestedQuestions');
+  if (!el) return;
+  el.innerHTML = questions.map(q =>
+    `<button onclick="askQ('${q.replace(/'/g,"\\'")}')" style="text-align:left;background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:8px 10px;font-size:11px;color:#374151;cursor:pointer;width:100%;" onmouseover="this.style.background='#eef2ff';this.style.borderColor='#6366f1'" onmouseout="this.style.background='#fff';this.style.borderColor='#e5e7eb'">${q}</button>`
+  ).join('');
+}
+
 function askQ(q) {
   document.getElementById('chatInput').value = q;
   sendMsg();
@@ -1883,21 +2003,22 @@ function sendMsg() {
   setTimeout(() => {
     removeTyping(tid);
     const r = findAnswer(q);
-    addAIMsg(r.sql, r.ans);
+    addAIMsg(r);
   }, 1600);
 }
 
 function findAnswer(q) {
   const lq = q.toLowerCase();
-  for(const qa of QA) {
+  for(let i = 0; i < QA.length; i++) {
+    const qa = QA[i];
     if(qa.kw.some(k => lq.includes(k))) {
-      document.getElementById('sqlPreview').innerHTML = qa.sql.replace(/\n/g,'<br>').replace(/ /g,'&nbsp;');
-      return qa;
+      updateSuggestedQuestions(QA_FOLLOWUPS[i]);
+      return { ...qa, chart: QA_CHARTS[i], followups: QA_FOLLOWUPS[i] };
     }
   }
   const sql = `SELECT metric, value\nFROM analytics.summary\nWHERE employer_id = 'techcorp_gcc'`;
-  document.getElementById('sqlPreview').innerHTML = sql.replace(/\n/g,'<br>');
-  return { sql, ans: `Your workforce has <b>5,200 employees</b> with claims PEPM ₹2,847 and 23% high-risk. Try: "Why did our premium go up?", "How many are high risk?", or "What is our wellness ROI?"` };
+  updateSuggestedQuestions(['Why did our premium go up?', 'How many are high risk?', 'What is our wellness ROI?']);
+  return { sql, ans: `Your workforce has <b>5,200 employees</b> with claims PEPM ₹2,847 and 23% high-risk. Try: "Why did our premium go up?", "How many are high risk?", or "What is our wellness ROI?"`, chart: null };
 }
 
 function addUserMsg(txt) {
@@ -1909,21 +2030,23 @@ function addUserMsg(txt) {
   c.scrollTop = c.scrollHeight;
 }
 
-function addAIMsg(sql, ans) {
+function addAIMsg(r) {
   const c = document.getElementById('chatMessages');
   const div = document.createElement('div');
   div.className = 'chat-msg flex gap-3';
+  const chartHtml = buildChart(r.chart);
+  const queryId = 'q' + Date.now();
   div.innerHTML = `
     <div style="width:28px;height:28px;background:#00236f;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:11px;flex-shrink:0;margin-top:2px;">AI</div>
     <div class="flex-1" style="max-width:520px;">
-      <div style="background:#f3f4f5;border-radius:1rem;border-top-left-radius:0.125rem;padding:1rem;" class="text-sm text-on-surface-variant">${ans}</div>
-      <div style="margin-top:8px;background:#18181b;border-radius:0.75rem;padding:10px 12px;">
-        <div style="color:#6b7280;font-size:10px;margin-bottom:4px;">Query executed · zero PHI sent</div>
-        <div style="color:#4ade80;font-size:11px;font-family:monospace;line-height:1.5;">${sql.replace(/\n/g,'<br>').replace(/ /g,'&nbsp;')}</div>
+      <div style="background:#f3f4f5;border-radius:1rem;border-top-left-radius:0.125rem;padding:1rem;" class="text-sm text-on-surface-variant">${r.ans}${chartHtml}</div>
+      <div style="margin-top:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+        <span style="background:#6cf8bb;color:#00714d;border-radius:9999px;font-size:11px;padding:2px 8px;font-weight:500;">🔒 Zero PHI · Perimeter secured</span>
+        <span onclick="var el=document.getElementById('${queryId}');el.style.display=el.style.display==='none'?'block':'none'" style="color:#9ca3af;font-size:11px;cursor:pointer;user-select:none;">view query ▾</span>
       </div>
-      <div style="margin-top:6px;display:flex;align-items:center;gap:8px;">
-        <span style="background:#6cf8bb;color:#00714d;border-radius:9999px;font-size:11px;padding:2px 8px;font-weight:500;">PHI NEVER LEFT PERIMETER</span>
-        <span style="color:#444651;font-size:11px;cursor:pointer;text-decoration:underline;">VIEW GENERATED SQL QUERY ▼</span>
+      <div id="${queryId}" style="display:none;margin-top:6px;background:#18181b;border-radius:0.75rem;padding:10px 12px;">
+        <div style="color:#6b7280;font-size:10px;margin-bottom:4px;">Generated SQL · zero PHI sent</div>
+        <div style="color:#4ade80;font-size:11px;font-family:monospace;line-height:1.5;">${r.sql.replace(/\n/g,'<br>').replace(/ /g,'&nbsp;')}</div>
       </div>
     </div>`;
   c.appendChild(div);
